@@ -14,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.GridView;
 import android.widget.ImageView;
+import android.widget.Toast;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -27,10 +28,11 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 
-public class MainFragment extends Fragment {
-    ImageView mImage;
-    GridView mGridView;
-    ImageAdapter mImageAdapter;
+public class MainFragment extends Fragment implements RecyclerClickListener{
+    String TAG="MainFragment";
+//    ImageView mImage;
+//    GridView mGridView;
+//    ImageAdapter mImageAdapter;
     RecyclerView mRecyclerView;
     private GridViewAdapter mGridViewAdapter;
     private GridLayoutManager mLayout;
@@ -46,24 +48,15 @@ public class MainFragment extends Fragment {
 //        mImage=(ImageView) view.findViewById(R.id.image_view);
 
         View view =inflater.inflate(R.layout.grid_fragment, container, false);
-//        mRecyclerView=(RecyclerView) view.findViewById(R.id.recycler_view);
-//        mRecyclerView.setHasFixedSize(true);
-//        mRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 3));
-
-
 
         mLayout=new GridLayoutManager(getActivity(),2);
         mRecyclerView=(RecyclerView) view.findViewById(R.id.recycler_view);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(mLayout);
-        mGridViewAdapter=new GridViewAdapter(getActivity());
+        mGridViewAdapter=new GridViewAdapter(getActivity(),this);
         mRecyclerView.setAdapter(mGridViewAdapter);
 
-
 //        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-
-//        mGridView=(GridView) view.findViewById(R.id.grid_view);
-//        mImageAdapter=new ImageAdapter(getActivity().getApplicationContext(),R.layout.individual_movie_pics_for_gridview, mGridArray);
         return view;
     }
 
@@ -78,11 +71,15 @@ public class MainFragment extends Fragment {
 //        String location = prefs.getString(getString(R.string.pref_location_key),
 //                getString(R.string.pref_location_default));
         fetchMoviesTask.execute();
+    }
 
+    @Override
+    public void recyclerClicked(View v, int position) {
+        Log.e(TAG, "interface callback: "+position+", Movie: "+mMovieArray.get(position).getMovieTitle());
+        Toast.makeText(getActivity(),mMovieArray.get(position).getMovieTitle(),Toast.LENGTH_SHORT).show();
     }
 
     public class FetchMoviesTask extends AsyncTask<ArrayList<Movie>, Void, ArrayList<Movie>> {
-
         private final String LOG_TAG = MainFragment.class.getSimpleName();
 
         private ArrayList<Movie> parseJson(String JsonStr) throws JSONException {

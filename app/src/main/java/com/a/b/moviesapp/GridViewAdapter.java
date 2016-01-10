@@ -26,17 +26,20 @@ import java.util.List;
 /**
  * Created by Andrew on 1/7/2016.
  */
-public class GridViewAdapter extends RecyclerView.Adapter <GridViewAdapter.MyViewHolder> implements View.OnClickListener{
+public class GridViewAdapter extends RecyclerView.Adapter <GridViewAdapter.MyViewHolder>{
     String TAG="GridViewAdapter";
     Integer mPicHeight=0;
-
+    private static RecyclerClickListener mListener;
 //    private final LayoutInflater inflater;
     List<Movie>mMovies= Collections.emptyList();
     Context mContext;
-    public GridViewAdapter(Context context){
+    public GridViewAdapter(Context context,RecyclerClickListener clickListener){
         mContext=context;
-
-        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        mListener=clickListener;
+        mPicHeight=getHeight();
+    }
+    public Integer getHeight(){
+        WindowManager wm = (WindowManager) mContext.getSystemService(Context.WINDOW_SERVICE);
         DisplayMetrics metrics = Resources.getSystem().getDisplayMetrics();
         Display display = wm.getDefaultDisplay();
         Point point=new Point();
@@ -45,17 +48,12 @@ public class GridViewAdapter extends RecyclerView.Adapter <GridViewAdapter.MyVie
         float px = marginFloat * (metrics.densityDpi / 160f);
         Integer marginInt=Math.round(px);
 
-        mPicHeight=3 * ((point.x / 2) -(marginInt * 2))/2;
+        Integer height=3 * ((point.x / 2) -(marginInt * 2))/2;
 
-        Log.e(TAG, "display metrics: " + point.x + ", y: " + point.y+", PicHeight: "+mPicHeight);
-
+        Log.e(TAG, "display metrics: " + point.x + ", y: " + point.y+", PicHeight: "+height);
+        return height;
     }
 
-//    public GridViewAdapter(Context context, List<Movie> movies) {
-//        mContext=context;
-////        inflater= LayoutInflater.from(context);
-//        mMovies=movies;
-//    }
     public void setList(List<Movie>movies){
         mMovies=movies;
         notifyDataSetChanged();
@@ -66,26 +64,23 @@ public class GridViewAdapter extends RecyclerView.Adapter <GridViewAdapter.MyVie
         LayoutInflater inflater=LayoutInflater.from(parent.getContext());
         View view=inflater.inflate(R.layout.image_box, parent, false);
 
-
         view.getLayoutParams().height=mPicHeight;
 
-        view.setOnClickListener(this);
+//        view.setOnClickListener(this);
         MyViewHolder holder=new MyViewHolder(view);
         return holder;
     }
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
+
         Movie current=mMovies.get(position);
 //        holder.mTextView.setText("testing a bunch");
 //        holder.mImageView.setImageResource(R.mipmap.ic_launcher);
 //        String fullUrl="http://image.tmdb.org/t/p/w500/"+current.getMovieUrl();
         String fullUrl="http://image.tmdb.org/t/p/w780/"+current.getMovieUrl();
         Log.e(TAG, "fullUrl: " + fullUrl);
-//        Picasso.with(holder.mImageView.getContext())
-//                .load(Uri.parse(fullUrl))
-////                .load(URLEncoder.encode(fullUrl))
-//                .into(holder.mImageView);
+
 //        Picasso.with(holder.mImageView.getContext())
 //                .load(R.mipmap.hadoop_png)
 ////                .fit()
@@ -99,7 +94,6 @@ public class GridViewAdapter extends RecyclerView.Adapter <GridViewAdapter.MyVie
                 .load(fullUrl)
                 .placeholder(R.drawable.placeholder_vertical)
                 .into(holder.mImageView);
-
 
 //        holder.mImageView.setImageResource(R.drawable.hadoop);
 
@@ -116,18 +110,13 @@ public class GridViewAdapter extends RecyclerView.Adapter <GridViewAdapter.MyVie
         return mMovies.size();
     }
 
-    @Override
-    public void onClick(View v) {
-        Log.e(TAG,"clickeded!!");
-    }
-
     class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         ImageView mImageView;
-//        TextView mTextView;
 
         public MyViewHolder(View itemView) {
             super(itemView);
             mImageView=(ImageView) itemView.findViewById(R.id.movie_picture);
+            itemView.setOnClickListener(this);
 //            mImageView.setOnClickListener(this);
 //            mTextView=(TextView) itemView.findViewById(R.id.wordage);
         }
@@ -135,6 +124,7 @@ public class GridViewAdapter extends RecyclerView.Adapter <GridViewAdapter.MyVie
         @Override
         public void onClick(View v) {
             Log.e("MyViewHolder","clicked!");
+            mListener.recyclerClicked(v,this.getLayoutPosition());
         }
     }
 }
