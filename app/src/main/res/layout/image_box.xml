@@ -1,14 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    android:orientation="vertical"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content">
+    android:layout_height="280dp"
+    android:layout_margin="@dimen/picture_margin"
+    android:background="#ff0000">
 
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:id="@+id/movie_picture"/>
+        android:id="@+id/movie_picture"
+        android:layout_gravity="center_vertical"/>
+        <!--android:src="@drawable/october"-->
 
         <!--android:src="@drawable/abc_ic_menu_share_mtrl_alpha"/>-->
     <!--<TextView-->

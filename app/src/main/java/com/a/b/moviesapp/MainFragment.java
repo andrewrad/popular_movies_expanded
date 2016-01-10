@@ -4,6 +4,7 @@ import android.app.Fragment;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.v7.widget.DefaultItemAnimator;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -32,6 +33,7 @@ public class MainFragment extends Fragment {
     ImageAdapter mImageAdapter;
     RecyclerView mRecyclerView;
     private GridViewAdapter mGridViewAdapter;
+    private GridLayoutManager mLayout;
     private ArrayList<Movie> mMovieArray;
 
     public MainFragment() {
@@ -44,8 +46,21 @@ public class MainFragment extends Fragment {
 //        mImage=(ImageView) view.findViewById(R.id.image_view);
 
         View view =inflater.inflate(R.layout.grid_fragment, container, false);
-        mRecyclerView=(RecyclerView) view.findViewById(R.id.recycler_view);
+//        mRecyclerView=(RecyclerView) view.findViewById(R.id.recycler_view);
+//        mRecyclerView.setHasFixedSize(true);
+//        mRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 3));
 
+
+
+        mLayout=new GridLayoutManager(getActivity(),2);
+        mRecyclerView=(RecyclerView) view.findViewById(R.id.recycler_view);
+        mRecyclerView.setHasFixedSize(true);
+        mRecyclerView.setLayoutManager(mLayout);
+        mGridViewAdapter=new GridViewAdapter(getActivity());
+        mRecyclerView.setAdapter(mGridViewAdapter);
+
+
+//        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
 
 //        mGridView=(GridView) view.findViewById(R.id.grid_view);
 //        mImageAdapter=new ImageAdapter(getActivity().getApplicationContext(),R.layout.individual_movie_pics_for_gridview, mGridArray);
@@ -170,19 +185,24 @@ public class MainFragment extends Fragment {
         }
 
         @Override
-        protected void onPostExecute(ArrayList<Movie> result) {
+        protected void onPostExecute(final ArrayList<Movie> result) {
 //            if (result != null) {
 //                Log.e("json", result.toString());
 //                for(int i=0; i<result.size();i++){
 //                    Log.e("result","result: "+i+": "+result.get(i).getMovieUrl());
 //                }
 //                }
-            mRecyclerView.setHasFixedSize(true);
-            mRecyclerView.setLayoutManager(new GridLayoutManager(getActivity(), 3));
-            mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-            mGridViewAdapter = new GridViewAdapter(getActivity(),mMovieArray);
-            mRecyclerView.setAdapter(mGridViewAdapter);
-//            mRecyclerView.setLayoutManager(new LinearLayoutManager(getActivity()));
+
+            final Handler handler = new Handler();
+
+            final Runnable r = new Runnable() {
+                public void run() {
+                    mGridViewAdapter.setList(result);
+//                    handler.postDelayed(this, 1000);
+                }
+            };
+            handler.postDelayed(r, 1000);
+
 
             if(mMovieArray!=null)
                 for(Movie m:mMovieArray){

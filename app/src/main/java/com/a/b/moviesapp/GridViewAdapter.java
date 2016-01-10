@@ -2,12 +2,17 @@ package com.a.b.moviesapp;
 
 import android.app.Fragment;
 import android.content.Context;
+import android.content.res.Resources;
+import android.graphics.Point;
 import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
+import android.util.DisplayMetrics;
 import android.util.Log;
+import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -23,20 +28,47 @@ import java.util.List;
  */
 public class GridViewAdapter extends RecyclerView.Adapter <GridViewAdapter.MyViewHolder> implements View.OnClickListener{
     String TAG="GridViewAdapter";
+    Integer mPicHeight=0;
 
-    private final LayoutInflater inflater;
+//    private final LayoutInflater inflater;
     List<Movie>mMovies= Collections.emptyList();
     Context mContext;
-
-    public GridViewAdapter(Context context, List<Movie> movies) {
+    public GridViewAdapter(Context context){
         mContext=context;
-        inflater= LayoutInflater.from(context);
+
+        WindowManager wm = (WindowManager) context.getSystemService(Context.WINDOW_SERVICE);
+        DisplayMetrics metrics = Resources.getSystem().getDisplayMetrics();
+        Display display = wm.getDefaultDisplay();
+        Point point=new Point();
+        display.getSize(point);
+        float marginFloat=mContext.getApplicationContext().getResources().getDimension(R.dimen.picture_margin);
+        float px = marginFloat * (metrics.densityDpi / 160f);
+        Integer marginInt=Math.round(px);
+
+        mPicHeight=3 * ((point.x / 2) -(marginInt * 2))/2;
+
+        Log.e(TAG, "display metrics: " + point.x + ", y: " + point.y+", PicHeight: "+mPicHeight);
+
+    }
+
+//    public GridViewAdapter(Context context, List<Movie> movies) {
+//        mContext=context;
+////        inflater= LayoutInflater.from(context);
+//        mMovies=movies;
+//    }
+    public void setList(List<Movie>movies){
         mMovies=movies;
+        notifyDataSetChanged();
     }
 
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        View view=inflater.inflate(R.layout.image_box,null,false);
+        LayoutInflater inflater=LayoutInflater.from(parent.getContext());
+        View view=inflater.inflate(R.layout.image_box, parent, false);
+
+
+        view.getLayoutParams().height=mPicHeight;
+
         view.setOnClickListener(this);
         MyViewHolder holder=new MyViewHolder(view);
         return holder;
@@ -49,7 +81,7 @@ public class GridViewAdapter extends RecyclerView.Adapter <GridViewAdapter.MyVie
 //        holder.mImageView.setImageResource(R.mipmap.ic_launcher);
 //        String fullUrl="http://image.tmdb.org/t/p/w500/"+current.getMovieUrl();
         String fullUrl="http://image.tmdb.org/t/p/w780/"+current.getMovieUrl();
-        Log.e("RecyclerView", "fullUrl: " + fullUrl);
+        Log.e(TAG, "fullUrl: " + fullUrl);
 //        Picasso.with(holder.mImageView.getContext())
 //                .load(Uri.parse(fullUrl))
 ////                .load(URLEncoder.encode(fullUrl))
@@ -63,10 +95,13 @@ public class GridViewAdapter extends RecyclerView.Adapter <GridViewAdapter.MyVie
 
         Glide.with(mContext)
 //                .load(R.mipmap.hadoop_png)
+//                .load(R.drawable.hadoop_png)
                 .load(fullUrl)
                 .placeholder(R.drawable.placeholder_vertical)
                 .into(holder.mImageView);
 
+
+//        holder.mImageView.setImageResource(R.drawable.hadoop);
 
 //        Uri uri = Uri.parse(movie.getPoster());
 //        Context c = holder.mImageView.getContext();
