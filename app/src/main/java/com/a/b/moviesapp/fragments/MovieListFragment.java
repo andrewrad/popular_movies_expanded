@@ -1,20 +1,25 @@
-package com.a.b.moviesapp;
+package com.a.b.moviesapp.fragments;
 
-import android.app.Fragment;
+import android.app.Activity;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.GridView;
-import android.widget.ImageView;
 import android.widget.Toast;
+
+import com.a.b.moviesapp.GridViewAdapter;
+import com.a.b.moviesapp.MainInterface;
+import com.a.b.moviesapp.Movie;
+import com.a.b.moviesapp.R;
+import com.a.b.moviesapp.RecyclerClickListener;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -28,8 +33,10 @@ import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
 
-public class MainFragment extends Fragment implements RecyclerClickListener{
-    String TAG="MainFragment";
+public class MovieListFragment extends Fragment implements RecyclerClickListener {
+
+    String TAG="MovieListFragment";
+    MainInterface.MovieInterface mListener;
 //    ImageView mImage;
 //    GridView mGridView;
 //    ImageAdapter mImageAdapter;
@@ -38,14 +45,11 @@ public class MainFragment extends Fragment implements RecyclerClickListener{
     private GridLayoutManager mLayout;
     private ArrayList<Movie> mMovieArray;
 
-    public MainFragment() {
+    public MovieListFragment() {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
-//        View view =inflater.inflate(R.layout.fragment_main,container,false);
-//        mImage=(ImageView) view.findViewById(R.id.image_view);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
 
         View view =inflater.inflate(R.layout.grid_fragment, container, false);
 
@@ -55,6 +59,8 @@ public class MainFragment extends Fragment implements RecyclerClickListener{
         mRecyclerView.setLayoutManager(mLayout);
         mGridViewAdapter=new GridViewAdapter(getActivity(),this);
         mRecyclerView.setAdapter(mGridViewAdapter);
+
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Movies");
 
 //        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         return view;
@@ -77,10 +83,14 @@ public class MainFragment extends Fragment implements RecyclerClickListener{
     public void recyclerClicked(View v, int position) {
         Log.e(TAG, "interface callback: "+position+", Movie: "+mMovieArray.get(position).getMovieTitle());
         Toast.makeText(getActivity(),mMovieArray.get(position).getMovieTitle(),Toast.LENGTH_SHORT).show();
+//        Intent intent=new Intent(getActivity(),DetailActivity.class);
+//        startActivity(intent);
+        mListener.openDetailFragment();
+
     }
 
     public class FetchMoviesTask extends AsyncTask<ArrayList<Movie>, Void, ArrayList<Movie>> {
-        private final String LOG_TAG = MainFragment.class.getSimpleName();
+        private final String LOG_TAG = MovieListFragment.class.getSimpleName();
 
         private ArrayList<Movie> parseJson(String JsonStr) throws JSONException {
             final String POSTER_URL="poster_path";
@@ -217,6 +227,19 @@ public class MainFragment extends Fragment implements RecyclerClickListener{
 
             }
         }
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        // Verify that the host activity implements the callback interface
+        try {
+            // Instantiate the NoticeDialogListener so we can send events to the host
+            mListener = (MainInterface.MovieInterface) activity;
+        } catch (ClassCastException e) {
+            // The activity doesn't implement the interface, throw exception
+            throw new ClassCastException(activity.toString()
+                    + " must implement NoticeDialogListener");
+        }
+    }
     }
 
 

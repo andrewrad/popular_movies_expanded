@@ -3,4 +3,6 @@
     <string name="app_name">MoviesApp</string>
     <string name="hello_world">Hello world! and stuffs</string>
     <string name="action_settings">Settings</string>
+    <string name="title_activity_detail">DetailActivity</string>
+    <string name="backpress">Press Again to Exit</string>
 </resources>
