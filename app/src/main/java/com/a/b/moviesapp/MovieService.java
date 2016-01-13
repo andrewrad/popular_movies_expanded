@@ -35,7 +35,7 @@
 //                    "http://api.themoviedb.org/3/discover/movie?";
 //
 //            final String SORT_BY= "sort_by";
-//            final String POPULARITY="popularity.desc";
+//            final String MOST_POPULAR="popularity.desc";
 //            final String API_KEY="api_key";
 //
 //            Uri builtUri = Uri.parse(BASE_URL).buildUpon()

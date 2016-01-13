@@ -10,6 +10,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.a.b.moviesapp.Constants;
 import com.a.b.moviesapp.MainInterface;
 import com.a.b.moviesapp.R;
 import com.a.b.moviesapp.fragments.MovieListFragment;
@@ -29,47 +30,44 @@ public class MainActivity extends AppCompatActivity implements MainInterface.Mov
         setContentView(R.layout.activity_main);
 
         mToolbar= (Toolbar) findViewById(R.id.toolbar_main);
-        mToolbar.setTitle("Movies");
+//        mToolbar.setTitle("Movies");
         setSupportActionBar(mToolbar);
 
         mMainFragment=new MovieListFragment();
+//        mMainFragment.getMovies(Constants.MOST_POPULAR);
 
         FragmentTransaction ft=fragmentManager.beginTransaction();
         ft.replace(R.id.fragment_container, mMainFragment);
         ft.commit();
     }
 
-
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
-        // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.menu_main, menu);
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
-        //noinspection SimplifiableIfStatement
-        if (id == R.id.action_settings) {
-            return true;
+        if (id == R.id.action_popular_sort) {
+            mMainFragment.getMovies(Constants.MOST_POPULAR);
+            getSupportActionBar().setTitle("Movies: Most Popular");
+
+        }else if(id==R.id.action_highest_rated){
+            mMainFragment.getMovies(Constants.HIGHEST_RATED);
+            getSupportActionBar().setTitle("Movies: Highest Rated");
         }
         return super.onOptionsItemSelected(item);
     }
 
     @Override
-    public void openDetailFragment() {
+    public void openDetailFragment(Bundle detail) {
         MovieDetailsFragment movieDetailsFragment=new MovieDetailsFragment();
 
-        Bundle bundle=new Bundle();
-//        bundle.putString();
-        movieDetailsFragment.setArguments(bundle);
+        movieDetailsFragment.setArguments(detail);
 
         FragmentTransaction ft=getSupportFragmentManager().beginTransaction();
-//        ft.remove(mMainFragment);
         ft.replace(R.id.fragment_container, movieDetailsFragment);
         ft.addToBackStack(null);
         ft.commit();

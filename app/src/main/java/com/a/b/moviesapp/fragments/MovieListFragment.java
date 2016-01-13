@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.os.Handler;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
@@ -15,6 +14,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Toast;
 
+import com.a.b.moviesapp.Constants;
 import com.a.b.moviesapp.GridViewAdapter;
 import com.a.b.moviesapp.MainInterface;
 import com.a.b.moviesapp.Movie;
@@ -60,89 +60,64 @@ public class MovieListFragment extends Fragment implements RecyclerClickListener
         mGridViewAdapter=new GridViewAdapter(getActivity(),this);
         mRecyclerView.setAdapter(mGridViewAdapter);
 
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Movies");
+        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Movies: Most Popular");
 
 //        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
         return view;
     }
-
     @Override
-    public void onStart() {
-        super.onStart();
-        getMovies();
+    public void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setRetainInstance(true);
     }
-    private void getMovies() {
+
+//    @Override
+//    public void onStart() {
+//        super.onStart();
+//        getMovies(Constants.MOST_POPULAR);
+//    }
+
+    public void getMovies(String order) {
         FetchMoviesTask fetchMoviesTask = new FetchMoviesTask();
 //        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
 //        String location = prefs.getString(getString(R.string.pref_location_key),
 //                getString(R.string.pref_location_default));
-        fetchMoviesTask.execute();
+        fetchMoviesTask.execute(order);
     }
 
     @Override
     public void recyclerClicked(View v, int position) {
-        Log.e(TAG, "interface callback: "+position+", Movie: "+mMovieArray.get(position).getMovieTitle());
+        Log.e(TAG, "interface callback: " + position + ", Movie: " + mMovieArray.get(position).getMovieTitle());
         Toast.makeText(getActivity(),mMovieArray.get(position).getMovieTitle(),Toast.LENGTH_SHORT).show();
-//        Intent intent=new Intent(getActivity(),DetailActivity.class);
-//        startActivity(intent);
-        mListener.openDetailFragment();
 
+        Bundle bundle=new Bundle();
+        bundle.putString(Constants.POSTER_PATH,mMovieArray.get(position).getPosterUrl());
+        bundle.putString(Constants.BACKDROP_PATH,mMovieArray.get(position).getBackDropUrl());
+        bundle.putString(Constants.TITLE,mMovieArray.get(position).getMovieTitle());
+        bundle.putString(Constants.DATE, mMovieArray.get(position).getDate());
+        bundle.putString(Constants.OVERVIEW, mMovieArray.get(position).getSummary());
+        bundle.putDouble(Constants.RATING, mMovieArray.get(position).getRating());
+
+        mListener.openDetailFragment(bundle);
     }
 
-    public class FetchMoviesTask extends AsyncTask<ArrayList<Movie>, Void, ArrayList<Movie>> {
+    public class FetchMoviesTask extends AsyncTask<String, Void, ArrayList<Movie>> {
         private final String LOG_TAG = MovieListFragment.class.getSimpleName();
 
-        private ArrayList<Movie> parseJson(String JsonStr) throws JSONException {
-            final String POSTER_URL="poster_path";
-            final String PHOTO_URL="backdrop_path";
-            final String TITLE="title";
-            final String OVERVIEW="overview";
-            final String DATE="release_date";
-            final String RATING="vote_count";
-
-            mMovieArray=new ArrayList<Movie>();
-
-            JSONObject MoviesJson = new JSONObject(JsonStr);
-            JSONArray moviesArray = MoviesJson.has("results")? MoviesJson.getJSONArray("results"):null;
-            if(moviesArray!=null){
-                for(int i=0; i<moviesArray.length();i++){
-
-                    JSONObject movieObj=moviesArray.getJSONObject(i);
-                    Log.e("test","test object: "+i+": "+movieObj.toString());
-                    Log.e("testing","URL: "+(movieObj.has(POSTER_URL)?movieObj.getString(POSTER_URL):null));
-                    String title = movieObj.has(TITLE)?movieObj.getString(TITLE):"";
-                    String overview = movieObj.has(OVERVIEW)?movieObj.getString(OVERVIEW):"";
-                    String url=movieObj.has(POSTER_URL)?movieObj.getString(POSTER_URL):"";
-                    String date=movieObj.has(DATE)?movieObj.getString(DATE):"";
-                    Double review = movieObj.has(RATING)?movieObj.getDouble(RATING):null;
-
-//                    Movie movie = new Movie(title,overview,url,date,review);
-//                    movies.add(new Movie(title,overview,url,date,review));
-                    mMovieArray.add(new Movie(title,overview,url,date,review));
-//                    Log.e("test grab","grabbing url: "+movie.)
-                }
-            }
-            return mMovieArray;
-        }
         @Override
-        protected ArrayList<Movie> doInBackground(ArrayList<Movie>... params) {
+        protected ArrayList<Movie> doInBackground(String... params) {
             HttpURLConnection urlConnection = null;
             BufferedReader reader = null;
             String forecastJsonStr = null;
             try {
-                final String BASE_URL ="http://api.themoviedb.org/3/discover/movie?";
-                final String SORT_BY= "sort_by";
-                final String POPULARITY="popularity.desc";
-                final String API_KEY="api_key";
-
-                Uri builtUri = Uri.parse(BASE_URL).buildUpon()
-                        .appendQueryParameter(SORT_BY, "popularity.desc")
-                        .appendQueryParameter(API_KEY, getResources().getString(R.string.api_key))
-//                        .appendQueryParameter(DAYS_PARAM, Integer.toString(numDays))
+                Log.e(TAG, "sort order: " + params.toString());
+                Uri builtUri = Uri.parse(Constants.BASE_URL).buildUpon()
+                        .appendQueryParameter(Constants.SORT_BY, params[0])
+                        .appendQueryParameter(Constants.API_KEY, getResources().getString(R.string.api_key))
                         .build();
 
                 URL url = new URL(builtUri.toString());
-                Log.e("URL","Movies URL: "+url);
+                Log.e("URL","Movies URL JSON Object: "+url);
 
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
@@ -191,6 +166,32 @@ public class MovieListFragment extends Fragment implements RecyclerClickListener
             return null;
         }
 
+        private ArrayList<Movie> parseJson(String JsonStr) throws JSONException {
+
+            mMovieArray=new ArrayList<Movie>();
+
+            JSONObject MoviesJson = new JSONObject(JsonStr);
+            JSONArray moviesArray = MoviesJson.has("results")? MoviesJson.getJSONArray("results"):null;
+            if(moviesArray!=null){
+                for(int i=0; i<moviesArray.length();i++){
+
+                    JSONObject movieObj=moviesArray.getJSONObject(i);
+                    Movie movie=new Movie();
+
+                    movie.mTitle = movieObj.has(Constants.TITLE)?movieObj.getString(Constants.TITLE):"";
+                    movie.mOverview = movieObj.has(Constants.OVERVIEW)?movieObj.getString(Constants.OVERVIEW):"";
+                    movie.mPosterUrl=movieObj.has(Constants.POSTER_PATH)?movieObj.getString(Constants.POSTER_PATH):"";
+                    movie.mBackDropUrl=movieObj.has(Constants.BACKDROP_PATH)?movieObj.getString(Constants.BACKDROP_PATH):"";
+                    movie.mDate=movieObj.has(Constants.DATE)?movieObj.getString(Constants.DATE):"";
+                    movie.mVoteAverage = movieObj.has(Constants.RATING)?movieObj.getDouble(Constants.RATING):null;
+
+//                    mMovieArray.add(new Movie(title,overview,photo_url,backdrop_url,date,review));
+                    mMovieArray.add(movie);
+                }
+            }
+            return mMovieArray;
+        }
+
         @Override
         protected void onPostExecute(final ArrayList<Movie> result) {
 //            if (result != null) {
@@ -200,20 +201,18 @@ public class MovieListFragment extends Fragment implements RecyclerClickListener
 //                }
 //                }
 
-            final Handler handler = new Handler();
-
-            final Runnable r = new Runnable() {
-                public void run() {
+//            final Handler handler = new Handler();
+//            final Runnable r = new Runnable() {
+//                public void run() {
                     mGridViewAdapter.setList(result);
 //                    handler.postDelayed(this, 1000);
-                }
-            };
-            handler.postDelayed(r, 1000);
-
+//                }
+//            };
+//            handler.postDelayed(r, 1000);
 
             if(mMovieArray!=null)
                 for(Movie m:mMovieArray){
-                    Log.e("onPostExecute","movie: "+m.getMovieTitle()+", url: "+m.getMovieUrl());
+                    Log.e("onPostExecute","movie: "+m.getMovieTitle()+", url: "+m.getPosterUrl());
                 }
 //            mGridView.setAdapter(new ImageAdapter(getActivity().getApplicationContext(),result));
 
@@ -224,7 +223,6 @@ public class MovieListFragment extends Fragment implements RecyclerClickListener
 //                            Toast.LENGTH_SHORT).show();
 //                }
 //            });
-
             }
         }
     @Override
@@ -240,6 +238,6 @@ public class MovieListFragment extends Fragment implements RecyclerClickListener
                     + " must implement NoticeDialogListener");
         }
     }
-    }
+}
 
 

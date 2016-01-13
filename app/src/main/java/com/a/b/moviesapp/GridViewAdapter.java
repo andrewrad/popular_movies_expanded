@@ -78,15 +78,10 @@ public class GridViewAdapter extends RecyclerView.Adapter <GridViewAdapter.MyVie
 //        holder.mTextView.setText("testing a bunch");
 //        holder.mImageView.setImageResource(R.mipmap.ic_launcher);
 //        String fullUrl="http://image.tmdb.org/t/p/w500/"+current.getMovieUrl();
-        String fullUrl="http://image.tmdb.org/t/p/w780/"+current.getMovieUrl();
+        String fullUrl="http://image.tmdb.org/t/p/w780/"+current.getPosterUrl();
         Log.e(TAG, "fullUrl: " + fullUrl);
 
 //        Picasso.with(holder.mImageView.getContext())
-//                .load(R.mipmap.hadoop_png)
-////                .fit()
-//                .centerCrop()
-////                .load(URLEncoder.encode(fullUrl))
-//                .into(holder.mImageView);
 
         Glide.with(mContext)
 //                .load(R.mipmap.hadoop_png)
