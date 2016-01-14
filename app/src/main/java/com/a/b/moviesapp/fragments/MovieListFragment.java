@@ -5,14 +5,12 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.Toast;
 
 import com.a.b.moviesapp.Constants;
 import com.a.b.moviesapp.GridViewAdapter;
@@ -34,61 +32,66 @@ import java.net.URL;
 import java.util.ArrayList;
 
 public class MovieListFragment extends Fragment implements RecyclerClickListener {
-
     String TAG="MovieListFragment";
     MainInterface.MovieInterface mListener;
-//    ImageView mImage;
-//    GridView mGridView;
-//    ImageAdapter mImageAdapter;
     RecyclerView mRecyclerView;
     private GridViewAdapter mGridViewAdapter;
     private GridLayoutManager mLayout;
     private ArrayList<Movie> mMovieArray;
 
-    public MovieListFragment() {
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.grid_fragment, container, false);
 
-        View view =inflater.inflate(R.layout.grid_fragment, container, false);
-
-        mLayout=new GridLayoutManager(getActivity(),2);
-        mRecyclerView=(RecyclerView) view.findViewById(R.id.recycler_view);
+        mLayout = new GridLayoutManager(getActivity(), 2);
+        mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(mLayout);
-        mGridViewAdapter=new GridViewAdapter(getActivity(),this);
+        mGridViewAdapter = new GridViewAdapter(getActivity(), this);
         mRecyclerView.setAdapter(mGridViewAdapter);
-
-        ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle("Movies: Most Popular");
-
 //        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
+        if(mMovieArray!=null) {
+            mGridViewAdapter.setList(mMovieArray);
+        }
         return view;
     }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setRetainInstance(true);
+//        setRetainInstance(true);
+        if(savedInstanceState==null){
+            getMovies(Constants.MOST_POPULAR);
+//            ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(R.string.action_popular_sort);
+        }else{
+//            Log.e(TAG, "OnCreate-- savedinstancestate--not null");
+//            Log.e(TAG, "movies saved: " + savedInstanceState.getParcelableArray("movies"));
+        }
     }
 
-//    @Override
-//    public void onStart() {
-//        super.onStart();
-//        getMovies(Constants.MOST_POPULAR);
-//    }
+    @Override
+    public void onPause() {
+        super.onPause();
+//        Log.e(TAG, "Paused");
+//        Bundle bun=new Bundle();
+//        bun.putParcelableArrayList("movies",mMovieArray);
+//        onSaveInstanceState(bun);
+    }
+
+    @Override
+    public void onSaveInstanceState(Bundle outState) {
+//        outState.putParcelableArrayList("movies", mMovieArray);
+//        Log.e(TAG, "savedInstanceState method called");
+        super.onSaveInstanceState(outState);
+    }
 
     public void getMovies(String order) {
         FetchMoviesTask fetchMoviesTask = new FetchMoviesTask();
-//        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
-//        String location = prefs.getString(getString(R.string.pref_location_key),
-//                getString(R.string.pref_location_default));
         fetchMoviesTask.execute(order);
     }
 
     @Override
     public void recyclerClicked(View v, int position) {
-        Log.e(TAG, "interface callback: " + position + ", Movie: " + mMovieArray.get(position).getMovieTitle());
-        Toast.makeText(getActivity(),mMovieArray.get(position).getMovieTitle(),Toast.LENGTH_SHORT).show();
+//        Log.e(TAG, "interface callback: " + position + ", Movie: " + mMovieArray.get(position).getMovieTitle());
 
         Bundle bundle=new Bundle();
         bundle.putString(Constants.POSTER_PATH,mMovieArray.get(position).getPosterUrl());
@@ -117,17 +120,15 @@ public class MovieListFragment extends Fragment implements RecyclerClickListener
                         .build();
 
                 URL url = new URL(builtUri.toString());
-                Log.e("URL","Movies URL JSON Object: "+url);
+//                Log.e("URL","Movies URL JSON Object: "+url);
 
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
                 urlConnection.connect();
 
-                // Read the input stream into a String
                 InputStream inputStream = urlConnection.getInputStream();
                 StringBuffer buffer = new StringBuffer();
                 if (inputStream == null) {
-                    // Nothing to do.
                     return null;
                 }
                 reader = new BufferedReader(new InputStreamReader(inputStream));
@@ -138,12 +139,11 @@ public class MovieListFragment extends Fragment implements RecyclerClickListener
                 }
 
                 if (buffer.length() == 0) {
-                    // Stream was empty.  No point in parsing.
                     return null;
                 }
                 forecastJsonStr = buffer.toString();
             } catch (IOException e) {
-                Log.e(LOG_TAG, "Error ", e);
+//                Log.e(TAG, "Error ", e);
                 return null;
             } finally {
                 if (urlConnection != null) {
@@ -153,7 +153,7 @@ public class MovieListFragment extends Fragment implements RecyclerClickListener
                     try {
                         reader.close();
                     } catch (final IOException e) {
-                        Log.e(LOG_TAG, "Error closing stream", e);
+//                        Log.e(TAG, "Error closing stream", e);
                     }
                 }
             }
@@ -185,7 +185,6 @@ public class MovieListFragment extends Fragment implements RecyclerClickListener
                     movie.mDate=movieObj.has(Constants.DATE)?movieObj.getString(Constants.DATE):"";
                     movie.mVoteAverage = movieObj.has(Constants.RATING)?movieObj.getDouble(Constants.RATING):null;
 
-//                    mMovieArray.add(new Movie(title,overview,photo_url,backdrop_url,date,review));
                     mMovieArray.add(movie);
                 }
             }
@@ -194,35 +193,14 @@ public class MovieListFragment extends Fragment implements RecyclerClickListener
 
         @Override
         protected void onPostExecute(final ArrayList<Movie> result) {
-//            if (result != null) {
-//                Log.e("json", result.toString());
-//                for(int i=0; i<result.size();i++){
-//                    Log.e("result","result: "+i+": "+result.get(i).getMovieUrl());
-//                }
-//                }
 
-//            final Handler handler = new Handler();
-//            final Runnable r = new Runnable() {
-//                public void run() {
-                    mGridViewAdapter.setList(result);
-//                    handler.postDelayed(this, 1000);
-//                }
-//            };
-//            handler.postDelayed(r, 1000);
+            mGridViewAdapter.setList(result);
+            mRecyclerView.scrollToPosition(0);
 
             if(mMovieArray!=null)
                 for(Movie m:mMovieArray){
-                    Log.e("onPostExecute","movie: "+m.getMovieTitle()+", url: "+m.getPosterUrl());
+//                    Log.e("onPostExecute","movie: "+m.getMovieTitle()+", url: "+m.getPosterUrl());
                 }
-//            mGridView.setAdapter(new ImageAdapter(getActivity().getApplicationContext(),result));
-
-//            mGridView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//                public void onItemClick(AdapterView<?> parent, View v,
-//                                        int position, long id) {
-//                    Toast.makeText(getActivity().getApplicationContext(), "" + position,
-//                            Toast.LENGTH_SHORT).show();
-//                }
-//            });
             }
         }
     @Override
@@ -233,11 +211,8 @@ public class MovieListFragment extends Fragment implements RecyclerClickListener
             // Instantiate the NoticeDialogListener so we can send events to the host
             mListener = (MainInterface.MovieInterface) activity;
         } catch (ClassCastException e) {
-            // The activity doesn't implement the interface, throw exception
             throw new ClassCastException(activity.toString()
                     + " must implement NoticeDialogListener");
         }
     }
 }
-
-

@@ -19,7 +19,10 @@
             android:layout_height="wrap_content"
             android:id="@+id/title_header"
             android:textSize="@dimen/detail_title"
-            tools:text="Star Wars: The Force Awakens"/>
+            tools:text="Star Wars: The Force Awakens"
+            android:layout_marginTop="16dp"
+            android:layout_marginRight="16dp"
+            android:layout_marginLeft="16dp"/>
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
@@ -47,7 +50,8 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     tools:text="4.5"
-                    android:textSize="18sp"/>
+                    android:textSize="@dimen/rating"
+                    android:layout_marginTop="16dp"/>
 
             </LinearLayout>
         </LinearLayout>
@@ -56,7 +60,8 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             tools:text="Thirty years after defeating the Galactic Empire, Han Solo and his allies face a new threat from the evil Kylo Ren and his army of Stormtroopers."
-            android:textSize="@dimen/summary"/>
+            android:textSize="@dimen/summary"
+            android:layout_margin="16dp"/>
 
     </LinearLayout>
 </ScrollView>

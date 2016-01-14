@@ -27,12 +27,12 @@ import java.util.List;
  * Created by Andrew on 1/7/2016.
  */
 public class GridViewAdapter extends RecyclerView.Adapter <GridViewAdapter.MyViewHolder>{
-    String TAG="GridViewAdapter";
+//    String TAG="GridViewAdapter";
     Integer mPicHeight=0;
     private static RecyclerClickListener mListener;
-//    private final LayoutInflater inflater;
     List<Movie>mMovies= Collections.emptyList();
     Context mContext;
+
     public GridViewAdapter(Context context,RecyclerClickListener clickListener){
         mContext=context;
         mListener=clickListener;
@@ -50,7 +50,7 @@ public class GridViewAdapter extends RecyclerView.Adapter <GridViewAdapter.MyVie
 
         Integer height=3 * ((point.x / 2) -(marginInt * 2))/2;
 
-        Log.e(TAG, "display metrics: " + point.x + ", y: " + point.y+", PicHeight: "+height);
+//        Log.e(TAG, "display metrics: " + point.x + ", y: " + point.y+", PicHeight: "+height);
         return height;
     }
 
@@ -66,7 +66,6 @@ public class GridViewAdapter extends RecyclerView.Adapter <GridViewAdapter.MyVie
 
         view.getLayoutParams().height=mPicHeight;
 
-//        view.setOnClickListener(this);
         MyViewHolder holder=new MyViewHolder(view);
         return holder;
     }
@@ -75,29 +74,13 @@ public class GridViewAdapter extends RecyclerView.Adapter <GridViewAdapter.MyVie
     public void onBindViewHolder(MyViewHolder holder, int position) {
 
         Movie current=mMovies.get(position);
-//        holder.mTextView.setText("testing a bunch");
-//        holder.mImageView.setImageResource(R.mipmap.ic_launcher);
-//        String fullUrl="http://image.tmdb.org/t/p/w500/"+current.getMovieUrl();
-        String fullUrl="http://image.tmdb.org/t/p/w780/"+current.getPosterUrl();
-        Log.e(TAG, "fullUrl: " + fullUrl);
-
-//        Picasso.with(holder.mImageView.getContext())
+        String fullUrl=Constants.TMDB_IMAGE_BASE_URL_LARGE+current.getPosterUrl();
 
         Glide.with(mContext)
-//                .load(R.mipmap.hadoop_png)
-//                .load(R.drawable.hadoop_png)
                 .load(fullUrl)
                 .placeholder(R.drawable.placeholder_vertical)
+                .crossFade(500)
                 .into(holder.mImageView);
-
-//        holder.mImageView.setImageResource(R.drawable.hadoop);
-
-//        Uri uri = Uri.parse(movie.getPoster());
-//        Context c = holder.mImageView.getContext();
-//        Glide.with(c).load(uri).placeholder(R.drawable.image).into(viewHolder.imageView);
-//        viewHolder.setPosition(i);
-
-//        holder.itemView.setTag(item);
     }
 
     @Override
@@ -112,13 +95,10 @@ public class GridViewAdapter extends RecyclerView.Adapter <GridViewAdapter.MyVie
             super(itemView);
             mImageView=(ImageView) itemView.findViewById(R.id.movie_picture);
             itemView.setOnClickListener(this);
-//            mImageView.setOnClickListener(this);
-//            mTextView=(TextView) itemView.findViewById(R.id.wordage);
         }
 
         @Override
         public void onClick(View v) {
-            Log.e("MyViewHolder","clicked!");
             mListener.recyclerClicked(v,this.getLayoutPosition());
         }
     }

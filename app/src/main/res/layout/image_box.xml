@@ -10,13 +10,5 @@
         android:layout_height="wrap_content"
         android:id="@+id/movie_picture"
         android:layout_gravity="center_vertical"/>
-        <!--android:src="@drawable/october"-->
-
-        <!--android:src="@drawable/abc_ic_menu_share_mtrl_alpha"/>-->
-    <!--<TextView-->
-        <!--android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content"-->
-        <!--android:id="@+id/wordage"-->
-        <!--android:text="words"/>-->
 
 </LinearLayout>

@@ -6,7 +6,8 @@
     <dimen name="fab_margin">16dp</dimen>
 
     <!--Details Page-->
-    <dimen name="detail_title">42sp</dimen>
+    <dimen name="detail_title">36sp</dimen>
     <dimen name="date">24sp</dimen>
-    <dimen name="summary">14sp</dimen>
+    <dimen name="rating">20sp</dimen>
+    <dimen name="summary">16sp</dimen>
 </resources>

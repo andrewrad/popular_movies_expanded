@@ -4,7 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 /**
- * Created by Andrew on 7/13/2015.
+ * Created by Andrew on 1/1/2015.
  */
 public class Movie implements Parcelable {
     public String mTitle;
@@ -14,25 +14,8 @@ public class Movie implements Parcelable {
     public String mDate;
     public Double mVoteAverage;
 
-//    public Movie(String title, String overview, String posterUrl, String backdropUrl,String date, Double vote){
-//        this.mTitle=title;
-//        this.mOverview=overview;
-//        this.mPosterUrl =posterUrl;
-//        this.mBackDropUrl=backdropUrl;
-//        this.mDate=date;
-//        this.mVoteAverage=vote;
-//    }
     public Movie(){
     }
-
-//    private Movie(Parcel in){
-//        mTitle=in.readString();
-//        mOverview=in.readString();
-//        mPosterUrl =in.readString();
-//        mBackDropUrl=in.readString();
-//        mDate=in.readString();
-//        mVoteAverage=in.readDouble();
-//    }
 
     public Movie(Parcel source){
         readFromParcel(source);

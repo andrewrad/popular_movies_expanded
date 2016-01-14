@@ -16,25 +16,24 @@ import com.a.b.moviesapp.R;
 import com.a.b.moviesapp.fragments.MovieListFragment;
 import com.a.b.moviesapp.fragments.MovieDetailsFragment;
 
-
 public class MainActivity extends AppCompatActivity implements MainInterface.MovieInterface{
     String TAG="MainActivity";
     Boolean backPressedToExitOnce=false;
     FragmentManager fragmentManager = getSupportFragmentManager();
     MovieListFragment mMainFragment;
+    String mToolBarTitle;
     Toolbar mToolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-
+        mToolBarTitle=getResources().getString(R.string.action_popular_sort);
         mToolbar= (Toolbar) findViewById(R.id.toolbar_main);
-//        mToolbar.setTitle("Movies");
+        mToolbar.setTitle(mToolBarTitle);
         setSupportActionBar(mToolbar);
 
         mMainFragment=new MovieListFragment();
-//        mMainFragment.getMovies(Constants.MOST_POPULAR);
 
         FragmentTransaction ft=fragmentManager.beginTransaction();
         ft.replace(R.id.fragment_container, mMainFragment);
@@ -50,14 +49,18 @@ public class MainActivity extends AppCompatActivity implements MainInterface.Mov
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-        if (id == R.id.action_popular_sort) {
+        if (id == R.id.menu_item_popular_sort) {
             mMainFragment.getMovies(Constants.MOST_POPULAR);
-            getSupportActionBar().setTitle("Movies: Most Popular");
+            mToolBarTitle=getResources().getString(R.string.action_popular_sort);
 
-        }else if(id==R.id.action_highest_rated){
+        }else if(id==R.id.menu_item_highest_rated){
             mMainFragment.getMovies(Constants.HIGHEST_RATED);
-            getSupportActionBar().setTitle("Movies: Highest Rated");
+            mToolBarTitle=getResources().getString(R.string.action_highest_rated);
+
+        }else if (id == R.id.menu_item_back) {
+            onBackPressed();
         }
+        getSupportActionBar().setTitle(mToolBarTitle);
         return super.onOptionsItemSelected(item);
     }
 
@@ -80,6 +83,7 @@ public class MainActivity extends AppCompatActivity implements MainInterface.Mov
         }
         if (fragmentManager.getBackStackEntryCount() > 0) {
             fragmentManager.popBackStack();
+            mToolbar.setTitle(mToolBarTitle);
 
         } else {
             Toast.makeText(this, R.string.backpress, Toast.LENGTH_SHORT).show();
