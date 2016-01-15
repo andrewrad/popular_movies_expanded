@@ -1,11 +1,16 @@
 <resources>
-    <string name="api_key"></string>
+    <string name="api_key">22e815e44d11366f2446d1fa6aa31e75</string>
     <string name="app_name">MoviesApp</string>
     <string name="action_settings">Settings</string>
+
     <string name="action_popular_sort">Most Popular</string>
     <string name="action_highest_rated">Highest Rated</string>
+
+    <string name="movie_details">Movie Details</string>
+
     <string name="title_activity_detail">DetailActivity</string>
     <string name="backpress">Press Again to Exit</string>
     <string name="list_movies">List Movies</string>
+    <string name="dead_network">Please check network connection</string>
 
 </resources>

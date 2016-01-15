@@ -6,12 +6,11 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
-import android.view.Menu;
-import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.a.b.moviesapp.Constants;
-import com.a.b.moviesapp.MainInterface;
+import com.a.b.moviesapp.other.Constants;
+import com.a.b.moviesapp.other.MainInterface;
+import com.a.b.moviesapp.other.Movie;
 import com.a.b.moviesapp.R;
 import com.a.b.moviesapp.fragments.MovieListFragment;
 import com.a.b.moviesapp.fragments.MovieDetailsFragment;
@@ -33,42 +32,20 @@ public class MainActivity extends AppCompatActivity implements MainInterface.Mov
         mToolbar.setTitle(mToolBarTitle);
         setSupportActionBar(mToolbar);
 
-        mMainFragment=new MovieListFragment();
-
-        FragmentTransaction ft=fragmentManager.beginTransaction();
-        ft.replace(R.id.fragment_container, mMainFragment);
-        ft.commit();
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.menu_main, menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        int id = item.getItemId();
-        if (id == R.id.menu_item_popular_sort) {
-            mMainFragment.getMovies(Constants.MOST_POPULAR);
-            mToolBarTitle=getResources().getString(R.string.action_popular_sort);
-
-        }else if(id==R.id.menu_item_highest_rated){
-            mMainFragment.getMovies(Constants.HIGHEST_RATED);
-            mToolBarTitle=getResources().getString(R.string.action_highest_rated);
-
-        }else if (id == R.id.menu_item_back) {
-            onBackPressed();
+        if(savedInstanceState==null) {
+            mMainFragment=new MovieListFragment();
+            FragmentTransaction ft = fragmentManager.beginTransaction();
+            ft.replace(R.id.fragment_container, mMainFragment).commit();
         }
-        getSupportActionBar().setTitle(mToolBarTitle);
-        return super.onOptionsItemSelected(item);
     }
 
     @Override
-    public void openDetailFragment(Bundle detail) {
+    public void openDetailFragment(Movie movie) {
         MovieDetailsFragment movieDetailsFragment=new MovieDetailsFragment();
 
-        movieDetailsFragment.setArguments(detail);
+        Bundle bundle = new Bundle();
+        bundle.putParcelable(Constants.DETAILS_BUNDLE,movie);
+        movieDetailsFragment.setArguments(bundle);
 
         FragmentTransaction ft=getSupportFragmentManager().beginTransaction();
         ft.replace(R.id.fragment_container, movieDetailsFragment);

@@ -1,25 +1,22 @@
 package com.a.b.moviesapp;
 
-import android.app.Fragment;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Point;
-import android.net.Uri;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
-import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ImageView;
-import android.widget.TextView;
 
 
+import com.a.b.moviesapp.other.Constants;
+import com.a.b.moviesapp.other.Movie;
 import com.bumptech.glide.Glide;
 
-import java.net.URLEncoder;
 import java.util.Collections;
 import java.util.List;
 
@@ -74,7 +71,7 @@ public class GridViewAdapter extends RecyclerView.Adapter <GridViewAdapter.MyVie
     public void onBindViewHolder(MyViewHolder holder, int position) {
 
         Movie current=mMovies.get(position);
-        String fullUrl=Constants.TMDB_IMAGE_BASE_URL_LARGE+current.getPosterUrl();
+        String fullUrl= Constants.TMDB_IMAGE_BASE_URL_LARGE+current.getPosterUrl();
 
         Glide.with(mContext)
                 .load(fullUrl)
@@ -85,7 +82,11 @@ public class GridViewAdapter extends RecyclerView.Adapter <GridViewAdapter.MyVie
 
     @Override
     public int getItemCount() {
-        return mMovies.size();
+        if(mMovies!=null){
+            return mMovies.size();
+        }else{
+            return 0;
+        }
     }
 
     class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{

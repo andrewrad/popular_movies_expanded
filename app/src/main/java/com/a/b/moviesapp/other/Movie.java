@@ -1,4 +1,4 @@
-package com.a.b.moviesapp;
+package com.a.b.moviesapp.other;
 
 import android.os.Parcel;
 import android.os.Parcelable;

@@ -5,17 +5,22 @@ import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
 
-import com.a.b.moviesapp.Constants;
+import com.a.b.moviesapp.other.Constants;
 import com.a.b.moviesapp.GridViewAdapter;
-import com.a.b.moviesapp.MainInterface;
-import com.a.b.moviesapp.Movie;
+import com.a.b.moviesapp.other.MainInterface;
+import com.a.b.moviesapp.other.Movie;
 import com.a.b.moviesapp.R;
 import com.a.b.moviesapp.RecyclerClickListener;
 
@@ -49,37 +54,59 @@ public class MovieListFragment extends Fragment implements RecyclerClickListener
         mRecyclerView.setLayoutManager(mLayout);
         mGridViewAdapter = new GridViewAdapter(getActivity(), this);
         mRecyclerView.setAdapter(mGridViewAdapter);
-//        mRecyclerView.setItemAnimator(new DefaultItemAnimator());
-        if(mMovieArray!=null) {
-            mGridViewAdapter.setList(mMovieArray);
-        }
+        mGridViewAdapter.setList(mMovieArray);
+
         return view;
     }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-//        setRetainInstance(true);
+        setHasOptionsMenu(true);
+
         if(savedInstanceState==null){
             getMovies(Constants.MOST_POPULAR);
-//            ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(R.string.action_popular_sort);
         }else{
-//            Log.e(TAG, "OnCreate-- savedinstancestate--not null");
-//            Log.e(TAG, "movies saved: " + savedInstanceState.getParcelableArray("movies"));
+            mMovieArray=savedInstanceState.getParcelableArrayList("movies");
+//            Log.e(TAG, "movies retrieved from savedInstanceState: " + savedInstanceState.getParcelableArrayList("movies"));
         }
+    }
+    @Override
+    public void onPrepareOptionsMenu(Menu menu) {
+        super.onPrepareOptionsMenu(menu);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
+        super.onCreateOptionsMenu(menu, inflater);
+        inflater.inflate(R.menu.menu_main, menu);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        int id = item.getItemId();
+        if (id == R.id.menu_item_popular_sort) {
+            getMovies(Constants.MOST_POPULAR);
+            ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(R.string.action_popular_sort);
+
+        }else if(id==R.id.menu_item_highest_rated) {
+            getMovies(Constants.HIGHEST_RATED);
+            ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(R.string.action_highest_rated);
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
     public void onPause() {
         super.onPause();
 //        Log.e(TAG, "Paused");
-//        Bundle bun=new Bundle();
-//        bun.putParcelableArrayList("movies",mMovieArray);
-//        onSaveInstanceState(bun);
+        Bundle bun=new Bundle();
+        bun.putParcelableArrayList("movies", mMovieArray);
+        onSaveInstanceState(bun);
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
-//        outState.putParcelableArrayList("movies", mMovieArray);
+        outState.putParcelableArrayList("movies", mMovieArray);
 //        Log.e(TAG, "savedInstanceState method called");
         super.onSaveInstanceState(outState);
     }
@@ -91,17 +118,7 @@ public class MovieListFragment extends Fragment implements RecyclerClickListener
 
     @Override
     public void recyclerClicked(View v, int position) {
-//        Log.e(TAG, "interface callback: " + position + ", Movie: " + mMovieArray.get(position).getMovieTitle());
-
-        Bundle bundle=new Bundle();
-        bundle.putString(Constants.POSTER_PATH,mMovieArray.get(position).getPosterUrl());
-        bundle.putString(Constants.BACKDROP_PATH,mMovieArray.get(position).getBackDropUrl());
-        bundle.putString(Constants.TITLE,mMovieArray.get(position).getMovieTitle());
-        bundle.putString(Constants.DATE, mMovieArray.get(position).getDate());
-        bundle.putString(Constants.OVERVIEW, mMovieArray.get(position).getSummary());
-        bundle.putDouble(Constants.RATING, mMovieArray.get(position).getRating());
-
-        mListener.openDetailFragment(bundle);
+        mListener.openDetailFragment(mMovieArray.get(position));
     }
 
     public class FetchMoviesTask extends AsyncTask<String, Void, ArrayList<Movie>> {
@@ -113,14 +130,14 @@ public class MovieListFragment extends Fragment implements RecyclerClickListener
             BufferedReader reader = null;
             String forecastJsonStr = null;
             try {
-                Log.e(TAG, "sort order: " + params.toString());
+//                Log.e(TAG, "sort order: " + params.toString());
                 Uri builtUri = Uri.parse(Constants.BASE_URL).buildUpon()
                         .appendQueryParameter(Constants.SORT_BY, params[0])
-                        .appendQueryParameter(Constants.API_KEY, getResources().getString(R.string.api_key))
+                        .appendQueryParameter(Constants.API_KEY, Constants.API_KEY_STRING)
                         .build();
 
                 URL url = new URL(builtUri.toString());
-//                Log.e("URL","Movies URL JSON Object: "+url);
+//                Log.e("URL", "Movies URL JSON Object: " + url);
 
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
@@ -143,7 +160,14 @@ public class MovieListFragment extends Fragment implements RecyclerClickListener
                 }
                 forecastJsonStr = buffer.toString();
             } catch (IOException e) {
-//                Log.e(TAG, "Error ", e);
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getActivity(), R.string.dead_network, Toast.LENGTH_LONG).show();
+                    }
+                });
+
+                Log.e(TAG, "Error ", e);
                 return null;
             } finally {
                 if (urlConnection != null) {
@@ -153,7 +177,7 @@ public class MovieListFragment extends Fragment implements RecyclerClickListener
                     try {
                         reader.close();
                     } catch (final IOException e) {
-//                        Log.e(TAG, "Error closing stream", e);
+                        Log.e(TAG, "Error closing stream", e);
                     }
                 }
             }
@@ -168,22 +192,22 @@ public class MovieListFragment extends Fragment implements RecyclerClickListener
 
         private ArrayList<Movie> parseJson(String JsonStr) throws JSONException {
 
-            mMovieArray=new ArrayList<Movie>();
+            mMovieArray = new ArrayList<Movie>();
 
             JSONObject MoviesJson = new JSONObject(JsonStr);
-            JSONArray moviesArray = MoviesJson.has("results")? MoviesJson.getJSONArray("results"):null;
-            if(moviesArray!=null){
-                for(int i=0; i<moviesArray.length();i++){
+            JSONArray moviesArray = MoviesJson.has("results") ? MoviesJson.getJSONArray("results") : null;
+            if (moviesArray != null) {
+                for (int i = 0; i < moviesArray.length(); i++) {
 
-                    JSONObject movieObj=moviesArray.getJSONObject(i);
-                    Movie movie=new Movie();
+                    JSONObject movieObj = moviesArray.getJSONObject(i);
+                    Movie movie = new Movie();
 
-                    movie.mTitle = movieObj.has(Constants.TITLE)?movieObj.getString(Constants.TITLE):"";
-                    movie.mOverview = movieObj.has(Constants.OVERVIEW)?movieObj.getString(Constants.OVERVIEW):"";
-                    movie.mPosterUrl=movieObj.has(Constants.POSTER_PATH)?movieObj.getString(Constants.POSTER_PATH):"";
-                    movie.mBackDropUrl=movieObj.has(Constants.BACKDROP_PATH)?movieObj.getString(Constants.BACKDROP_PATH):"";
-                    movie.mDate=movieObj.has(Constants.DATE)?movieObj.getString(Constants.DATE):"";
-                    movie.mVoteAverage = movieObj.has(Constants.RATING)?movieObj.getDouble(Constants.RATING):null;
+                    movie.mTitle = movieObj.has(Constants.TITLE) ? movieObj.getString(Constants.TITLE) : "";
+                    movie.mOverview = movieObj.has(Constants.OVERVIEW) ? movieObj.getString(Constants.OVERVIEW) : "";
+                    movie.mPosterUrl = movieObj.has(Constants.POSTER_PATH) ? movieObj.getString(Constants.POSTER_PATH) : "";
+                    movie.mBackDropUrl = movieObj.has(Constants.BACKDROP_PATH) ? movieObj.getString(Constants.BACKDROP_PATH) : "";
+                    movie.mDate = movieObj.has(Constants.DATE) ? movieObj.getString(Constants.DATE) : "";
+                    movie.mVoteAverage = movieObj.has(Constants.RATING) ? movieObj.getDouble(Constants.RATING) : null;
 
                     mMovieArray.add(movie);
                 }
@@ -193,16 +217,16 @@ public class MovieListFragment extends Fragment implements RecyclerClickListener
 
         @Override
         protected void onPostExecute(final ArrayList<Movie> result) {
+            if (mMovieArray != null) {
+                mGridViewAdapter.setList(result);
+                mRecyclerView.scrollToPosition(0);
 
-            mGridViewAdapter.setList(result);
-            mRecyclerView.scrollToPosition(0);
-
-            if(mMovieArray!=null)
-                for(Movie m:mMovieArray){
-//                    Log.e("onPostExecute","movie: "+m.getMovieTitle()+", url: "+m.getPosterUrl());
-                }
+//                for (Movie m : mMovieArray) {
+//                    Log.e("onPostExecute", "movie: " + m.getMovieTitle() + ", url: " + m.getPosterUrl());
+//                }
             }
         }
+    }
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);

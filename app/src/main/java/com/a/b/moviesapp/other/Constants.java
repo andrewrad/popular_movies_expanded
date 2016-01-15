@@ -1,9 +1,10 @@
-package com.a.b.moviesapp;
+package com.a.b.moviesapp.other;
 
 /**
  * Created by Andrew on 1/12/2016.
  */
 public class Constants {
+    public static final String API_KEY_STRING="22e815e44d11366f2446d1fa6aa31e75";
 
     public static final String POSTER_PATH ="poster_path";
     public static final String BACKDROP_PATH ="backdrop_path";
@@ -22,4 +23,5 @@ public class Constants {
     public static final String TMDB_IMAGE_BASE_URL="http://image.tmdb.org/t/p/w342/";
     public static final String TMDB_IMAGE_BASE_URL_SMALL="http://image.tmdb.org/t/p/w185/";
 
+    public static final String DETAILS_BUNDLE="movie_details";
 }
