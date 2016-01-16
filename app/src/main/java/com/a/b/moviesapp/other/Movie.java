@@ -13,6 +13,7 @@ public class Movie implements Parcelable {
     public String mBackDropUrl;
     public String mDate;
     public Double mVoteAverage;
+    public Integer mId;
 
     public Movie(){
     }
@@ -33,6 +34,7 @@ public class Movie implements Parcelable {
         dest.writeString(mBackDropUrl);
         dest.writeString(mDate);
         dest.writeDouble(mVoteAverage);
+        dest.writeInt(mId);
 
     }
     public void readFromParcel(Parcel source){
@@ -42,6 +44,7 @@ public class Movie implements Parcelable {
         mBackDropUrl=source.readString();
         mDate=source.readString();
         mVoteAverage=source.readDouble();
+        mId=source.readInt();
     }
     private final Parcelable.Creator<Movie>CREATOR=new Parcelable.Creator<Movie>(){
 
@@ -74,4 +77,6 @@ public class Movie implements Parcelable {
     public Double getRating(){
         return mVoteAverage;
     }
+    public Integer getId(){return mId;}
+    public void setId(Integer id){mId=id;}
 }

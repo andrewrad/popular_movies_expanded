@@ -12,6 +12,7 @@ public class Constants {
     public static final String OVERVIEW="overview";
     public static final String DATE="release_date";
     public static final String RATING="vote_average";
+    public static final String ID="id";
 
     public static final String SORT_BY= "sort_by";
     public static final String MOST_POPULAR ="popularity.desc";
@@ -22,6 +23,9 @@ public class Constants {
     public static final String TMDB_IMAGE_BASE_URL_LARGE="http://image.tmdb.org/t/p/w500/";
     public static final String TMDB_IMAGE_BASE_URL="http://image.tmdb.org/t/p/w342/";
     public static final String TMDB_IMAGE_BASE_URL_SMALL="http://image.tmdb.org/t/p/w185/";
+
+//    public static final String TRAILER_BASE_URL="http://api.themoviedb.org/3/movie/";
+    public static final String TRAILER_BASE_URL="http://api.themoviedb.org/";
 
     public static final String DETAILS_BUNDLE="movie_details";
 }

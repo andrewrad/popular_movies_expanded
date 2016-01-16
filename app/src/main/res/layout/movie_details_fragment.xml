@@ -62,6 +62,13 @@
             tools:text="Thirty years after defeating the Galactic Empire, Han Solo and his allies face a new threat from the evil Kylo Ren and his army of Stormtroopers."
             android:textSize="@dimen/summary"
             android:layout_margin="16dp"/>
+        <View android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:background="#FFFFFF" />
+        <TextView
+            android:id="@+id/trailer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content" />
 
     </LinearLayout>
 </ScrollView>

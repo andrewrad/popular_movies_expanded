@@ -137,7 +137,7 @@ public class MovieListFragment extends Fragment implements RecyclerClickListener
                         .build();
 
                 URL url = new URL(builtUri.toString());
-//                Log.e("URL", "Movies URL JSON Object: " + url);
+                Log.e("URL", "Movies URL JSON Object: " + url);
 
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
@@ -208,6 +208,7 @@ public class MovieListFragment extends Fragment implements RecyclerClickListener
                     movie.mBackDropUrl = movieObj.has(Constants.BACKDROP_PATH) ? movieObj.getString(Constants.BACKDROP_PATH) : "";
                     movie.mDate = movieObj.has(Constants.DATE) ? movieObj.getString(Constants.DATE) : "";
                     movie.mVoteAverage = movieObj.has(Constants.RATING) ? movieObj.getDouble(Constants.RATING) : null;
+                    movie.mId=movieObj.has(Constants.ID)?movieObj.getInt(Constants.ID):null;
 
                     mMovieArray.add(movie);
                 }

@@ -77,6 +77,7 @@ public class GridViewAdapter extends RecyclerView.Adapter <GridViewAdapter.MyVie
                 .load(fullUrl)
                 .placeholder(R.drawable.placeholder_vertical)
                 .crossFade(500)
+//                .error(R.drawable.user_placeholder_error)
                 .into(holder.mImageView);
     }
 
