@@ -1,8 +1,12 @@
 package com.a.b.moviesapp.fragments;
 
+import android.app.ActionBar;
+import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
+import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -10,39 +14,54 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AbsListView;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
+import android.widget.ListAdapter;
+import android.widget.ListView;
+import android.widget.SimpleAdapter;
 import android.widget.TextView;
 
 import com.a.b.moviesapp.other.ApiInterface;
 import com.a.b.moviesapp.other.Constants;
-import com.a.b.moviesapp.other.Movie;
+import com.a.b.moviesapp.pojo.Movie;
 import com.a.b.moviesapp.R;
 import com.a.b.moviesapp.other.RestClient;
-import com.a.b.moviesapp.other.Result;
-import com.a.b.moviesapp.other.TrailerResults;
+import com.a.b.moviesapp.pojo.ResultPOJO;
+import com.a.b.moviesapp.pojo.ReviewResult;
+import com.a.b.moviesapp.pojo.Reviews;
+import com.a.b.moviesapp.pojo.Youtube;
 import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
 
+import org.w3c.dom.Text;
+
+import java.util.ArrayList;
 import java.util.List;
 
 import retrofit.Call;
 import retrofit.Callback;
 import retrofit.Response;
-import retrofit.Retrofit;
 
 /**
  * Created by Andrew on 1/2/2016.
  */
-public class MovieDetailsFragment extends Fragment {
+public class MovieDetailsFragment extends Fragment{
     ImageView mBackGroundImage;
     ImageView mPosterPic;
     TextView mTitle;
     TextView mDate;
     TextView mRating;
     TextView mSummary;
-    TextView mTrailer;
+    TextView mReviews;
+    TextView mTrailersHeader;
+    ListView mTrailerListView;
+    ImageView mFavorite;
     String TAG="MovieDetailsFragment";
-    List<TrailerResults> Users ;
+    List<Movie> mMoreDetails;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
@@ -55,7 +74,10 @@ public class MovieDetailsFragment extends Fragment {
         mDate = (TextView) view.findViewById(R.id.date_view);
         mRating = (TextView) view.findViewById(R.id.rating_view);
         mSummary = (TextView) view.findViewById(R.id.summary_view);
-        mTrailer = (TextView) view.findViewById(R.id.trailer);
+        mReviews = (TextView) view.findViewById(R.id.reviews_textview);
+        mTrailersHeader=(TextView) view.findViewById(R.id.trailers_subtitle);
+        mTrailerListView=(ListView) view.findViewById(R.id.trailer_listview);
+        mFavorite =(ImageView) view.findViewById(R.id.favorited);
 
         populateViews();
         return view;
@@ -86,11 +108,23 @@ public class MovieDetailsFragment extends Fragment {
             mDate.setText(mMovieDetails.getDate());
             mRating.setText(String.valueOf(mMovieDetails.getRating()));
             mSummary.setText(mMovieDetails.getSummary());
-            mTrailer.setText(mTrailer.getId()>0?String.valueOf(mTrailer.getId()):null);
-            getTrailersAndReviews();
+
+            mFavorite.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Log.e(TAG,"star clicked");
+                    if (mFavorite.getDrawable().getConstantState().equals(getResources().getDrawable(android.R.drawable.star_big_on).getConstantState())) {
+                        mFavorite.setImageResource(android.R.drawable.star_big_off);
+                    } else {
+                        mFavorite.setImageResource(android.R.drawable.star_big_on);
+                    }
+                }
+            });
+
+            getTrailersAndReviews(mMovieDetails.getId());
         }
     }
-    public void getTrailersAndReviews(){
+    public void getTrailersAndReviews(Integer id){
 //        Retrofit client = new Retrofit.Builder()
 //                .baseUrl(Constants.TRAILER_BASE_URL)
 //                .build();
@@ -98,37 +132,88 @@ public class MovieDetailsFragment extends Fragment {
 //        ApiInterface service = client.create(ApiInterface.class);
 
         ApiInterface service=RestClient.getClient();
-        Call<Result> call = service.getMovieExtras("550");
-        call.enqueue(new Callback<Result>() {
+        Call<ResultPOJO> call = service.getMovieExtras(String.valueOf(id));
+//        Call<ResultPOJO> call=service.getUsersNamedTom("tom");
+        call.enqueue(new Callback<ResultPOJO>() {
             @Override
-            public void onResponse(Response<Result> response) {
+            public void onResponse(Response<ResultPOJO> response) {
                 Log.e(TAG, "Response code: " + response.code());
                 if (response.isSuccess()) {
                     // request successful (status code 200, 201)
-                    Log.e(TAG,"response body: "+response.body()+", message: "+response.message());
+                    Log.e(TAG, "response body: " + response.body().getTitle() + ", message: " + response.message());
 
-                    Result result = response.body();
-                    Log.e(TAG,"result result: "+result.getItems());
+                    ResultPOJO result = response.body();
+                    Log.e(TAG, "result id: " + result.getHomepage());
 
 //                    Log.e(TAG,"response JSON: "+new Gson().toJson(response.body())+", movie: "+result.getItems().get(0));
                     Log.e(TAG, "response = " + new Gson().toJson(result));
-                    Users = result.getItems();
-                    Log.e(TAG, "Items = " + Users.size());
+//                    mMoreDetails = result.getId();
+//                    Log.e(TAG, "Items = " + mMoreDetails.size() + ", results inner JSON: " + mMoreDetails.get(0).getKey());
+
+
+//                    final Youtube trailer = result.getTrailers().getYoutube().get(0);
+//                    Log.e(TAG, "youtube address: https://www.youtube.com/watch?v=" + trailer.getSource());
+
+                    final List<Youtube> trail=result.getTrailers().getYoutube();
+                    mTrailersHeader.setText(trail.size()>1?"Movie Trailers":"Movie Trailer");
+
+                    List<String> hi=new ArrayList<String>();
+                    for(int i=0;i<trail.size();i++){
+                        hi.add(trail.get(i).getName());
+                        Log.e(TAG,"trailer "+i+": "+trail.get(i).getName());
+                    }
+
+                    mTrailerListView.setItemsCanFocus(false);
+
+                    ArrayAdapter sa = new ArrayAdapter(getActivity(),R.layout.trailer_button, hi);
+                    mTrailerListView.setAdapter(sa);
+                    mTrailerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                        @Override
+                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                            Log.e(TAG,"clicked "+trail.get(position).getName()+", https://www.youtube.com/watch?v="+trail.get(position).getSource());
+                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.youtube.com/watch?v="+trail.get(position).getSource())));
+                        }
+                    });
+//                    ViewGroup.LayoutParams params=new LinearLayout.LayoutParams(ViewGroup.LayoutParams.WRAP_CONTENT, 150);
+//                    mTrailerListView.setLayoutParams(params);
+                    setListViewHeightBasedOnChildren(mTrailerListView);
+
+                    List<ReviewResult> rev = result.getReviews().getResults();
+                    String reviews = "";
+                    for (ReviewResult r : rev) {
+                        reviews += "Movie Review from " + r.getAuthor() + ": \n\n" +
+                                r.getContent() + "\n\n\n";
+                    }
+                    mReviews.setText(reviews);
                 } else {
-                    //request not successful (like 400,401,403 etc)
-                    //Handle errors
+                    Log.e(TAG, "request not successful??");
                 }
             }
 
             @Override
             public void onFailure(Throwable t) {
-
+                Log.e(TAG, "throwable failure!!!");
             }
         });
+    }
+    public static void setListViewHeightBasedOnChildren(ListView listView) {
+        ListAdapter listAdapter = listView.getAdapter();
+        if (listAdapter == null) {
+            // pre-condition
+            return;
+        }
 
-//        Movie m = new Movie();
-//        Log.e(TAG, "new stuff added to movie: "+res)
+        int totalHeight = 0;
+        for (int i = 0; i < listAdapter.getCount(); i++) {
+            View listItem = listAdapter.getView(i, null, listView);
+            listItem.measure(0, 0);
+            totalHeight += listItem.getMeasuredHeight();
+        }
 
+        ViewGroup.LayoutParams params = listView.getLayoutParams();
+        params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
+        listView.setLayoutParams(params);
+        listView.requestLayout();
     }
 
     @Override

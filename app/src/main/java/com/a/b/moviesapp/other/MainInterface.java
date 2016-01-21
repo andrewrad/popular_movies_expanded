@@ -1,5 +1,7 @@
 package com.a.b.moviesapp.other;
 
+import com.a.b.moviesapp.pojo.Movie;
+
 /**
  * Created by Andrew on 1/11/2016.
  */

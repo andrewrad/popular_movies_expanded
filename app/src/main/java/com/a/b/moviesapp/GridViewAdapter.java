@@ -14,7 +14,7 @@ import android.widget.ImageView;
 
 
 import com.a.b.moviesapp.other.Constants;
-import com.a.b.moviesapp.other.Movie;
+import com.a.b.moviesapp.pojo.Movie;
 import com.bumptech.glide.Glide;
 
 import java.util.Collections;

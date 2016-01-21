@@ -53,13 +53,14 @@ public class RestClient {
 
             Retrofit client = new Retrofit.Builder()
                     .baseUrl(Constants.TRAILER_BASE_URL)
+//                    .baseUrl(baseUrl)
                     .addConverter(String.class, new ToStringConverter())
                     .client(httpClient)
 //                    .addConverterFactory(GsonConverterFactory.create(gson))
                     .addConverterFactory(GsonConverterFactory.create())
                     .build();
             mApiInterface = client.create(ApiInterface.class);
-            Log.e(TAG,"RestClient testing log statement: "+client.baseUrl()+", "+httpClient.getDns());
+            Log.e(TAG,"RestClient testing log statement: "+client);
         }
 
         return mApiInterface ;
