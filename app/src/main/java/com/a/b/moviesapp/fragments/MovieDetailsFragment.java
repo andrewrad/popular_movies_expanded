@@ -24,6 +24,7 @@ import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.SimpleAdapter;
 import android.widget.TextView;
+import android.widget.ToggleButton;
 
 import com.a.b.moviesapp.other.ApiInterface;
 import com.a.b.moviesapp.other.Constants;
@@ -59,7 +60,8 @@ public class MovieDetailsFragment extends Fragment{
     TextView mReviews;
     TextView mTrailersHeader;
     ListView mTrailerListView;
-    ImageView mFavorite;
+//    ImageView mFavorite;
+    ToggleButton mFavorite;
     String TAG="MovieDetailsFragment";
     List<Movie> mMoreDetails;
 
@@ -77,7 +79,8 @@ public class MovieDetailsFragment extends Fragment{
         mReviews = (TextView) view.findViewById(R.id.reviews_textview);
         mTrailersHeader=(TextView) view.findViewById(R.id.trailers_subtitle);
         mTrailerListView=(ListView) view.findViewById(R.id.trailer_listview);
-        mFavorite =(ImageView) view.findViewById(R.id.favorited);
+//        mFavorite =(ImageView) view.findViewById(R.id.favorited);
+        mFavorite=(ToggleButton) view.findViewById(R.id.toggleButton);
 
         populateViews();
         return view;
@@ -109,17 +112,17 @@ public class MovieDetailsFragment extends Fragment{
             mRating.setText(String.valueOf(mMovieDetails.getRating()));
             mSummary.setText(mMovieDetails.getSummary());
 
-            mFavorite.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Log.e(TAG,"star clicked");
-                    if (mFavorite.getDrawable().getConstantState().equals(getResources().getDrawable(android.R.drawable.star_big_on).getConstantState())) {
-                        mFavorite.setImageResource(android.R.drawable.star_big_off);
-                    } else {
-                        mFavorite.setImageResource(android.R.drawable.star_big_on);
-                    }
-                }
-            });
+//            mFavorite.setOnClickListener(new View.OnClickListener() {
+//                @Override
+//                public void onClick(View v) {
+//                    Log.e(TAG,"star clicked");
+//                    if (mFavorite.getDrawable().getConstantState().equals(getResources().getDrawable(android.R.drawable.star_big_on).getConstantState())) {
+//                        mFavorite.setImageResource(android.R.drawable.star_big_off);
+//                    } else {
+//                        mFavorite.setImageResource(android.R.drawable.star_big_on);
+//                    }
+//                }
+//            });
 
             getTrailersAndReviews(mMovieDetails.getId());
         }
@@ -214,6 +217,12 @@ public class MovieDetailsFragment extends Fragment{
         params.height = totalHeight + (listView.getDividerHeight() * (listAdapter.getCount() - 1));
         listView.setLayoutParams(params);
         listView.requestLayout();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        Log.e(TAG, "onPause, toggleview is set to: "+mFavorite.isChecked());
     }
 
     @Override

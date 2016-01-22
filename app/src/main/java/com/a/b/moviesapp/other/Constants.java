@@ -28,4 +28,10 @@ public class Constants {
     public static final String TRAILER_BASE_URL="http://api.themoviedb.org/";
 
     public static final String DETAILS_BUNDLE="movie_details";
+
+    public static final String AUTHORITY="content://com.a.b";
+    public static final String TRAILERS="trailers";
+    public static final String SQL_ID="_id";
+    public static final String REVIEWS="reviews";
+    public static final String TABLE_NAME = "saved";
 }

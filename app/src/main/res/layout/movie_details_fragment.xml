@@ -31,9 +31,8 @@
 
             <ImageView
                 android:id="@+id/poster_detail"
-                android:layout_width="wrap_content"
-                android:layout_height="150dp"
-                android:background="#ff0000"/>
+                android:layout_width="100dp"
+                android:layout_height="150dp"/>
             <LinearLayout
                 android:layout_marginLeft="16dp"
                 android:layout_width="wrap_content"
@@ -47,17 +46,18 @@
                     android:textSize="@dimen/date"/>
                 <TextView
                     android:id="@+id/rating_view"
-                    android:layout_width="wrap_content"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     tools:text="4.5"
                     android:textSize="@dimen/rating"
                     android:layout_marginTop="16dp"/>
-                <ImageView
-                    android:id="@+id/favorited"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:padding="8dp"
-                    android:src="@android:drawable/star_big_off"/>
+                <ToggleButton
+                    android:id="@+id/toggleButton"
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:padding="16dp"
+                    style="@style/toggleButton"
+                    android:background="@drawable/ic_toggle_bg"/>
 
             </LinearLayout>
         </LinearLayout>
