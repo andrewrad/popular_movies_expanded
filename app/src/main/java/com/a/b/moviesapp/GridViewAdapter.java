@@ -5,6 +5,7 @@ import android.content.res.Resources;
 import android.graphics.Point;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -24,7 +25,7 @@ import java.util.List;
  * Created by Andrew on 1/7/2016.
  */
 public class GridViewAdapter extends RecyclerView.Adapter <GridViewAdapter.MyViewHolder>{
-//    String TAG="GridViewAdapter";
+    String TAG="GridViewAdapter ViewAdapter";
     Integer mPicHeight=0;
     private static RecyclerClickListener mListener;
     List<Movie>mMovies= Collections.emptyList();
@@ -73,12 +74,14 @@ public class GridViewAdapter extends RecyclerView.Adapter <GridViewAdapter.MyVie
         Movie current=mMovies.get(position);
         String fullUrl= Constants.TMDB_IMAGE_BASE_URL_LARGE+current.getPosterUrl();
 
+
+//        Log.e(TAG,"onBindViewHolder: ")
         Glide.with(mContext)
-                .load(fullUrl)
-                .placeholder(R.drawable.placeholder_vertical)
-                .crossFade(500)
-//                .error(R.drawable.user_placeholder_error)
-                .into(holder.mImageView);
+            .load(fullUrl)
+//            .placeholder(R.drawable.placeholder_vertical)
+            .crossFade(500)
+//             .error(R.drawable.user_placeholder_error)
+            .into(holder.mImageView);
     }
 
     @Override

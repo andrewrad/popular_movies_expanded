@@ -5,6 +5,7 @@
 
     <string name="action_popular_sort">Most Popular</string>
     <string name="action_highest_rated">Highest Rated</string>
+    <string name="action_favorited">Favorites</string>
 
     <string name="movie_details">Movie Details</string>
 

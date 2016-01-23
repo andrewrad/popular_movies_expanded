@@ -15,6 +15,13 @@ public class Movie implements Parcelable {
     public String mDate;
     public Double mVoteAverage;
 
+    private String mIso6391;
+    private String mKey;
+    private String mName;
+    private String mSite;
+    private Integer mSize;
+    private String mType;
+
     public Movie(){
     }
 
@@ -36,6 +43,13 @@ public class Movie implements Parcelable {
         dest.writeString(mDate);
         dest.writeDouble(mVoteAverage);
 
+        dest.writeString(mIso6391);
+        dest.writeString(mKey);
+        dest.writeString(mName);
+        dest.writeString(mSite);
+        dest.writeInt(mSize);
+        dest.writeString(mType);
+
     }
     public void readFromParcel(Parcel source){
         mId=source.readInt();
@@ -45,6 +59,14 @@ public class Movie implements Parcelable {
         mBackDropUrl=source.readString();
         mDate=source.readString();
         mVoteAverage=source.readDouble();
+
+        mIso6391=source.readString();
+        mKey=source.readString();
+        mName=source.readString();
+        mSite=source.readString();
+        mSize=source.readInt();
+        mType=source.readString();
+
     }
     private final Parcelable.Creator<Movie>CREATOR=new Parcelable.Creator<Movie>(){
 
@@ -59,90 +81,94 @@ public class Movie implements Parcelable {
         }
     };
 
-    public void setId(Integer id){mId=id;}
-    public Integer getId(){return mId;}
+    public void setId(Integer id){
+        mId=id;}
+    public Integer getId(){
+        return mId;}
     public String getMovieTitle(){
         return mTitle;
+    }
+    public void setMovieTitle(String title){
+        mTitle=title;
     }
     public String getPosterUrl(){
         return mPosterUrl;
     }
+    public void setPosterUrl(String url){
+        mPosterUrl=url;
+    }
     public String getBackDropUrl(){
         return mBackDropUrl;
+    }
+    public void setBackDropUrl(String url){
+        mBackDropUrl=url;
     }
     public String getDate(){
         return mDate;
     }
+    public void setDate(String date){
+        mDate=date;
+    }
     public String getSummary(){
         return mOverview;
+    }
+    public void setSummary(String summary){
+        mOverview=summary;
     }
     public Double getRating(){
         return mVoteAverage;
     }
-
-
-
-    private String id;
-    private String iso6391;
-    private String key;
-    private String name;
-    private String site;
-    private Integer size;
-    private String type;
-
-//    public String getId() {
-//        return id;
-//    }
-//
-//    public void setId(String id) {
-//        this.id = id;
-//    }
-
-    public String getIso6391() {
-        return iso6391;
+    public void setRating(Double rating){
+        mVoteAverage=rating;
     }
 
-    public void setIso6391(String iso6391) {
-        this.iso6391 = iso6391;
+
+
+    public String getIso6391() {
+        return mIso6391;
+    }
+
+    public void setIso6391(String mIso6391) {
+        this.mIso6391 = mIso6391;
     }
 
     public String getKey() {
-        return key;
+        return mKey;
     }
 
-    public void setKey(String key) {
-        this.key = key;
+    public void setKey(String mKey) {
+        this.mKey = mKey;
     }
 
-    public String getName() {
-        return name;
-    }
+//    public String getName() {
+//        return mName;
+//    }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+//    public void setName(String name) {
+//        this.mName = name;
+//    }
 
     public String getSite() {
-        return site;
+        return mSite;
     }
 
     public void setSite(String site) {
-        this.site = site;
+        this.mSite = site;
     }
 
     public Integer getSize() {
-        return size;
+        return mSize;
     }
 
     public void setSize(Integer size) {
-        this.size = size;
+        this.mSize = size;
     }
 
     public String getType() {
-        return type;
+        return mType;
     }
 
     public void setType(String type) {
-        this.type = type;
+        this.mType = type;
     }
 }

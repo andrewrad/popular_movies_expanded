@@ -20,19 +20,19 @@
 //        this.id = id;
 //    }
 //
-//    public String getIso6391() {
+//    public String getmIso6391() {
 //        return iso6391;
 //    }
 //
-//    public void setIso6391(String iso6391) {
+//    public void setmIso6391(String iso6391) {
 //        this.iso6391 = iso6391;
 //    }
 //
-//    public String getKey() {
+//    public String getmKey() {
 //        return key;
 //    }
 //
-//    public void setKey(String key) {
+//    public void setmKey(String key) {
 //        this.key = key;
 //    }
 //

@@ -19,12 +19,16 @@
             </intent-filter>
         </activity>
 
+
         <!--<service android:name=".MovieService" />-->
 
         <activity
             android:name=".activities.DetailActivity"
             android:label="@string/title_activity_detail"
             android:theme="@style/AppTheme.NoActionBar"></activity>
+        <provider
+            android:authorities="com.a.b"
+            android:name=".other.DataProvider" />
     </application>
 
 </manifest>

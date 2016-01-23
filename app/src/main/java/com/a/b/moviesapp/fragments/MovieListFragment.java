@@ -1,6 +1,7 @@
 package com.a.b.moviesapp.fragments;
 
 import android.app.Activity;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -35,6 +36,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
 public class MovieListFragment extends Fragment implements RecyclerClickListener {
     String TAG="MovieListFragment";
@@ -91,8 +93,42 @@ public class MovieListFragment extends Fragment implements RecyclerClickListener
         }else if(id==R.id.menu_item_highest_rated) {
             getMovies(Constants.HIGHEST_RATED);
             ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(R.string.action_highest_rated);
+        }else if(id==R.id.menu_item_favorited){
+            getFavorites();
+            ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(R.string.action_favorited);
         }
         return super.onOptionsItemSelected(item);
+    }
+    public void getFavorites(){
+        String[] selection=new String[]{Constants.TITLE};
+        Cursor cursor = getContext().getContentResolver().query(Uri.parse(Constants.CONTENT_AUTHORITY+"/get_stored_movies"),null,null,null,null);
+        if(cursor!=null) {
+            cursor.moveToFirst();
+            ArrayList<Movie> movies=new ArrayList<>();
+            do{
+                Log.e(TAG, "getFavorites: " + cursor.getString(1));
+
+                Movie m=new Movie();
+
+                m.setId(cursor.getInt(cursor.getColumnIndex(Constants.MOVIE_ID)));
+                m.setMovieTitle(cursor.getString(cursor.getColumnIndex(Constants.TITLE)));
+                m.setPosterUrl(cursor.getString(cursor.getColumnIndex(Constants.POSTER_PATH)));
+                m.setBackDropUrl(cursor.getString(cursor.getColumnIndex(Constants.BACKDROP_PATH)));
+                m.setDate(cursor.getString(cursor.getColumnIndex(Constants.DATE)));
+                m.setRating(cursor.getDouble(cursor.getColumnIndex(Constants.RATING)));
+                m.setSummary(cursor.getString(cursor.getColumnIndex(Constants.OVERVIEW)));
+
+//                Constants.TRAILERS
+//                Constants.REVIEWS
+
+                movies.add(m);
+            }while (cursor.moveToNext());
+            cursor.close();
+            mMovieArray=movies;
+
+            mGridViewAdapter.setList(movies);
+            mRecyclerView.scrollToPosition(0);
+        }
     }
 
     @Override
