@@ -14,6 +14,7 @@ public class Movie implements Parcelable {
     public String mBackDropUrl;
     public String mDate;
     public Double mVoteAverage;
+    public Boolean mFavorited;
 
     private String mIso6391;
     private String mKey;
@@ -42,6 +43,7 @@ public class Movie implements Parcelable {
         dest.writeString(mBackDropUrl);
         dest.writeString(mDate);
         dest.writeDouble(mVoteAverage);
+        dest.writeByte((byte)(mFavorited?1:0));
 
         dest.writeString(mIso6391);
         dest.writeString(mKey);
@@ -59,6 +61,7 @@ public class Movie implements Parcelable {
         mBackDropUrl=source.readString();
         mDate=source.readString();
         mVoteAverage=source.readDouble();
+        mFavorited=source.readByte()!=0;
 
         mIso6391=source.readString();
         mKey=source.readString();
@@ -121,6 +124,9 @@ public class Movie implements Parcelable {
     public void setRating(Double rating){
         mVoteAverage=rating;
     }
+    public Boolean getFavorite(){return mFavorited;}
+    public void setFavotite(Boolean favorite){mFavorited=favorite;}
+
 
 
 

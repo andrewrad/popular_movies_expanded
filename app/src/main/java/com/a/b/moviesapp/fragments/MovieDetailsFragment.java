@@ -1,6 +1,7 @@
 package com.a.b.moviesapp.fragments;
 
 import android.app.ActionBar;
+import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Intent;
 import android.net.Uri;
@@ -29,6 +30,9 @@ import android.widget.ToggleButton;
 
 import com.a.b.moviesapp.other.ApiInterface;
 import com.a.b.moviesapp.other.Constants;
+import com.a.b.moviesapp.other.MainInterface;
+import com.a.b.moviesapp.other.RefreshGridView;
+import com.a.b.moviesapp.other.UpdateGridView;
 import com.a.b.moviesapp.pojo.Movie;
 import com.a.b.moviesapp.R;
 import com.a.b.moviesapp.other.RestClient;
@@ -44,6 +48,7 @@ import org.w3c.dom.Text;
 import java.util.ArrayList;
 import java.util.List;
 
+import de.greenrobot.event.EventBus;
 import retrofit.Call;
 import retrofit.Callback;
 import retrofit.Response;
@@ -66,7 +71,7 @@ public class MovieDetailsFragment extends Fragment{
     Movie mMovieDetails;
 
     Boolean mCurrentlyFavorited=false;
-
+    private static UpdateGridView mListener;
 
     ToggleButton mFavorite;
     String TAG="MovieDetailsFragment";
@@ -94,6 +99,7 @@ public class MovieDetailsFragment extends Fragment{
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
+
     }
 
     public void populateViews(){
@@ -154,7 +160,7 @@ public class MovieDetailsFragment extends Fragment{
                     Log.e(TAG, "result id: " + mMovieExtras.getHomepage());
 
 //                    Log.e(TAG,"response JSON: "+new Gson().toJson(response.body())+", movie: "+result.getItems().get(0));
-                    Log.e(TAG, "response = " + new Gson().toJson(mMovieExtras));
+//                    Log.e(TAG, "response = " + new Gson().toJson(mMovieExtras));
 //                    mMoreDetails = result.getId();
 //                    Log.e(TAG, "Items = " + mMoreDetails.size() + ", results inner JSON: " + mMoreDetails.get(0).getKey());
 
@@ -224,33 +230,47 @@ public class MovieDetailsFragment extends Fragment{
         listView.requestLayout();
     }
 
+    /*
+    onPause: to determine if the favorite star  was selected or not
+    if favorited, check to see if is was previously favorited.
+    if not previously favorited, add the movie to the DB
+    if the movie is not favorited, attempt to remove it from the DB, if it returns 1, remove from DB and update the gridView
+     */
+
     @Override
     public void onPause() {
         super.onPause();
         Log.e(TAG, "onPause, toggleview is set to: " + mFavorite.isChecked());
 
         if(mFavorite.isChecked()) {
+            if(mMovieDetails.mFavorited!=Boolean.TRUE) {
 
-            ContentValues cv = new ContentValues();
-//        cv.put(Constants.MOVIE_ID,"efgwegerg415gh5e4r54ghe5rh");
-            if (mMovieDetails != null && mMovieExtras != null) {
-                cv.put(Constants.MOVIE_ID, mMovieDetails.getId());
-                cv.put(Constants.TITLE, mMovieDetails.getMovieTitle());
-                cv.put(Constants.POSTER_PATH, mMovieDetails.getPosterUrl());
-                cv.put(Constants.BACKDROP_PATH, mMovieDetails.getBackDropUrl());
-                cv.put(Constants.DATE, mMovieDetails.getDate());
-                cv.put(Constants.RATING, mMovieDetails.getRating());
-                cv.put(Constants.OVERVIEW, mMovieDetails.getSummary());
-                cv.put(Constants.TRAILERS, "trailers");
-                cv.put(Constants.REVIEWS, "reviews and stuff");
+                ContentValues cv = new ContentValues();
+//                cv.put(Constants.MOVIE_ID,"efgwegerg415gh5e4r54ghe5rh");
+                if (mMovieDetails != null && mMovieExtras != null) {
+                    cv.put(Constants.MOVIE_ID, mMovieDetails.getId());
+                    cv.put(Constants.TITLE, mMovieDetails.getMovieTitle());
+                    cv.put(Constants.POSTER_PATH, mMovieDetails.getPosterUrl());
+                    cv.put(Constants.BACKDROP_PATH, mMovieDetails.getBackDropUrl());
+                    cv.put(Constants.DATE, mMovieDetails.getDate());
+                    cv.put(Constants.RATING, mMovieDetails.getRating());
+                    cv.put(Constants.OVERVIEW, mMovieDetails.getSummary());
+                    cv.put(Constants.FAVORITED, Boolean.TRUE);
+                    cv.put(Constants.TRAILERS, "trailers");
+                    cv.put(Constants.REVIEWS, "reviews and stuff");
 
-//            cv.put(Constants.TRAILERS, mMovieExtras.getTrailers());
-//            cv.put(Constants.REVIEWS, mMovieExtras.getReviews());
+                    getContext().getContentResolver().insert(Uri.parse(Constants.CONTENT_AUTHORITY + "/insert"), cv);
+                    Log.e(TAG,"Added a movie");
+                }
             }
-            getContext().getContentResolver().insert(Uri.parse(Constants.CONTENT_AUTHORITY + "/insert"), cv);
         }else{
             String[]deleteId=new String[]{mMovieDetails.getMovieTitle()};
-            getContext().getContentResolver().delete(Uri.parse(Constants.CONTENT_AUTHORITY + "/delete"),Constants.MOVIE_ID,deleteId);
+            int deleted=getContext().getContentResolver().delete(Uri.parse(Constants.CONTENT_AUTHORITY + "/delete"),String.valueOf(mMovieDetails.getId()),null);
+            Log.e(TAG, "Deleted "+deleted+" movie");
+            if(deleted>0) {
+//                mListener.updateGridView();
+                EventBus.getDefault().postSticky(new RefreshGridView());
+            }
         }
     }
 
@@ -268,4 +288,16 @@ public class MovieDetailsFragment extends Fragment{
         }
         return super.onOptionsItemSelected(item);
     }
+//    @Override
+//    public void onAttach(Activity activity) {
+//        super.onAttach(activity);
+//        // Verify that the host activity implements the callback interface
+//        try {
+//            // Instantiate the NoticeDialogListener so we can send events to the host
+//            mListener = (MainInterface.MovieInterface) activity;
+//        } catch (ClassCastException e) {
+//            throw new ClassCastException(activity.toString()
+//                    + " must implement NoticeDialogListener");
+//        }
+//    }
 }

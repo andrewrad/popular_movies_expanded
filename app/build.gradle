@@ -36,4 +36,5 @@ dependencies {
     compile 'com.squareup.okhttp3:okhttp:3.0.1'
     compile 'com.squareup.retrofit:converter-gson:2.0.0-beta1'
     compile 'com.squareup.okhttp:logging-interceptor:2.7.0'
+    compile 'de.greenrobot:eventbus:2.4.0'
 }

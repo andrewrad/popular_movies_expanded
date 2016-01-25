@@ -23,6 +23,7 @@ public class DataProvider extends ContentProvider {
         final UriMatcher match=new UriMatcher(UriMatcher.NO_MATCH);
         match.addURI(Constants.AUTHORITY,"insert",1);
         match.addURI(Constants.AUTHORITY, "get_stored_movies", 2);
+        match.addURI(Constants.AUTHORITY, "delete",3);
         return match;
     }
 
@@ -80,7 +81,10 @@ public class DataProvider extends ContentProvider {
 
     @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
-        return 0;
+        final SQLiteDatabase db = mOpenHelper.getWritableDatabase();
+        Log.e(TAG, "Data Provider DELETE method");
+        int rows=db.delete(Constants.TABLE_NAME, Constants.MOVIE_ID+ "=" +selection,null);
+        return rows;
     }
 
     @Override

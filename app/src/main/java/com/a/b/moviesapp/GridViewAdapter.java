@@ -70,18 +70,19 @@ public class GridViewAdapter extends RecyclerView.Adapter <GridViewAdapter.MyVie
 
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
-
-        Movie current=mMovies.get(position);
-        String fullUrl= Constants.TMDB_IMAGE_BASE_URL_LARGE+current.getPosterUrl();
+        if(mMovies!=null) {
+            Movie current = mMovies.get(position);
+            String fullUrl = Constants.TMDB_IMAGE_BASE_URL_LARGE + current.getPosterUrl();
 
 
 //        Log.e(TAG,"onBindViewHolder: ")
-        Glide.with(mContext)
-            .load(fullUrl)
+            Glide.with(mContext)
+                    .load(fullUrl)
 //            .placeholder(R.drawable.placeholder_vertical)
-            .crossFade(500)
+                    .crossFade(500)
 //             .error(R.drawable.user_placeholder_error)
-            .into(holder.mImageView);
+                    .into(holder.mImageView);
+        }
     }
 
     @Override

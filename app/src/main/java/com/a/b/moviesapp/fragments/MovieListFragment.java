@@ -1,6 +1,7 @@
 package com.a.b.moviesapp.fragments;
 
 import android.app.Activity;
+import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -21,6 +22,8 @@ import android.widget.Toast;
 import com.a.b.moviesapp.other.Constants;
 import com.a.b.moviesapp.GridViewAdapter;
 import com.a.b.moviesapp.other.MainInterface;
+import com.a.b.moviesapp.other.RefreshGridView;
+import com.a.b.moviesapp.other.UpdateGridView;
 import com.a.b.moviesapp.pojo.Movie;
 import com.a.b.moviesapp.R;
 import com.a.b.moviesapp.RecyclerClickListener;
@@ -38,7 +41,9 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MovieListFragment extends Fragment implements RecyclerClickListener {
+import de.greenrobot.event.EventBus;
+
+public class MovieListFragment extends Fragment implements RecyclerClickListener{
     String TAG="MovieListFragment";
     MainInterface.MovieInterface mListener;
     RecyclerView mRecyclerView;
@@ -100,34 +105,40 @@ public class MovieListFragment extends Fragment implements RecyclerClickListener
         return super.onOptionsItemSelected(item);
     }
     public void getFavorites(){
+        Log.e(TAG,"getFavorites");
         String[] selection=new String[]{Constants.TITLE};
         Cursor cursor = getContext().getContentResolver().query(Uri.parse(Constants.CONTENT_AUTHORITY+"/get_stored_movies"),null,null,null,null);
-        if(cursor!=null) {
-            cursor.moveToFirst();
-            ArrayList<Movie> movies=new ArrayList<>();
-            do{
-                Log.e(TAG, "getFavorites: " + cursor.getString(1));
+        if(cursor!=null&& cursor.getCount()>0) {
+                cursor.moveToFirst();
+                ArrayList<Movie> movies = new ArrayList<>();
+                do {
+                    Log.e(TAG, "getFavorites: " + cursor.getString(1));
 
-                Movie m=new Movie();
+                    Movie m = new Movie();
 
-                m.setId(cursor.getInt(cursor.getColumnIndex(Constants.MOVIE_ID)));
-                m.setMovieTitle(cursor.getString(cursor.getColumnIndex(Constants.TITLE)));
-                m.setPosterUrl(cursor.getString(cursor.getColumnIndex(Constants.POSTER_PATH)));
-                m.setBackDropUrl(cursor.getString(cursor.getColumnIndex(Constants.BACKDROP_PATH)));
-                m.setDate(cursor.getString(cursor.getColumnIndex(Constants.DATE)));
-                m.setRating(cursor.getDouble(cursor.getColumnIndex(Constants.RATING)));
-                m.setSummary(cursor.getString(cursor.getColumnIndex(Constants.OVERVIEW)));
+                    m.setId(cursor.getInt(cursor.getColumnIndex(Constants.MOVIE_ID)));
+                    m.setMovieTitle(cursor.getString(cursor.getColumnIndex(Constants.TITLE)));
+                    m.setPosterUrl(cursor.getString(cursor.getColumnIndex(Constants.POSTER_PATH)));
+                    m.setBackDropUrl(cursor.getString(cursor.getColumnIndex(Constants.BACKDROP_PATH)));
+                    m.setDate(cursor.getString(cursor.getColumnIndex(Constants.DATE)));
+                    m.setRating(cursor.getDouble(cursor.getColumnIndex(Constants.RATING)));
+                    m.setSummary(cursor.getString(cursor.getColumnIndex(Constants.OVERVIEW)));
+                    m.setFavotite(cursor.getInt(cursor.getColumnIndex(Constants.FAVORITED)) == 1 ? Boolean.TRUE : Boolean.FALSE);
 
-//                Constants.TRAILERS
-//                Constants.REVIEWS
+                    //                Constants.TRAILERS
+                    //                Constants.REVIEWS
 
-                movies.add(m);
-            }while (cursor.moveToNext());
-            cursor.close();
-            mMovieArray=movies;
+                    movies.add(m);
+                } while (cursor.moveToNext());
+                cursor.close();
+                mMovieArray = movies;
 
-            mGridViewAdapter.setList(movies);
-            mRecyclerView.scrollToPosition(0);
+                mGridViewAdapter.setList(movies);
+                mRecyclerView.scrollToPosition(0);
+
+        }else{
+            mGridViewAdapter.setList(null);
+            Toast.makeText(getActivity(),"No Movies Favorited",Toast.LENGTH_SHORT).show();
         }
     }
 
@@ -156,6 +167,33 @@ public class MovieListFragment extends Fragment implements RecyclerClickListener
     public void recyclerClicked(View v, int position) {
         mListener.openDetailFragment(mMovieArray.get(position));
     }
+
+//    @Override
+//    public void updateGridView() {
+//        getFavorites();
+//        Cursor c=getContext().getContentResolver().query(Uri.parse(Constants.CONTENT_AUTHORITY),null,null,null,null);
+//        List<Movie>movies = new ArrayList<>();
+//        if(c!=null&&c.getCount()>0) {
+//            do {
+//                Movie mv=new Movie();
+//                mv.setFavotite(c.getString());
+//
+//            } while (c.moveToNext())
+//
+//            cv.put(Constants.MOVIE_ID, mMovieDetails.getId());
+//            cv.put(Constants.TITLE, mMovieDetails.getMovieTitle());
+//            cv.put(Constants.POSTER_PATH, mMovieDetails.getPosterUrl());
+//            cv.put(Constants.BACKDROP_PATH, mMovieDetails.getBackDropUrl());
+//            cv.put(Constants.DATE, mMovieDetails.getDate());
+//            cv.put(Constants.RATING, mMovieDetails.getRating());
+//            cv.put(Constants.OVERVIEW, mMovieDetails.getSummary());
+//            cv.put(Constants.FAVORITED, Boolean.TRUE);
+//            cv.put(Constants.TRAILERS, "trailers");
+//            cv.put(Constants.REVIEWS, "reviews and stuff");
+//        }
+//
+//        mGridViewAdapter.setList(movies);
+//    }
 
     public class FetchMoviesTask extends AsyncTask<String, Void, ArrayList<Movie>> {
         private final String LOG_TAG = MovieListFragment.class.getSimpleName();
@@ -263,6 +301,20 @@ public class MovieListFragment extends Fragment implements RecyclerClickListener
 //                }
             }
         }
+    }
+    public void onEvent(RefreshGridView event){
+        getFavorites();
+    }
+    @Override
+    public void onStart() {
+        super.onStart();
+        EventBus.getDefault().registerSticky(this);
+    }
+
+    @Override
+    public void onStop() {
+        EventBus.getDefault().unregister(this);
+        super.onStop();
     }
     @Override
     public void onAttach(Activity activity) {

@@ -16,6 +16,7 @@ public class Constants {
     public static final String DATE="release_date";
     public static final String RATING="vote_average";
     public static final String ID="id";
+    public static final String FAVORITED="favorited";
 
     public static final String SORT_BY= "sort_by";
     public static final String MOST_POPULAR ="popularity.desc";

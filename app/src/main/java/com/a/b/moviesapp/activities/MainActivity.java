@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.widget.Toast;
 
+import com.a.b.moviesapp.GridViewAdapter;
 import com.a.b.moviesapp.other.Constants;
 import com.a.b.moviesapp.other.MainInterface;
 import com.a.b.moviesapp.pojo.Movie;
@@ -51,6 +52,11 @@ public class MainActivity extends AppCompatActivity implements MainInterface.Mov
         ft.replace(R.id.fragment_container, movieDetailsFragment);
         ft.addToBackStack(null);
         ft.commit();
+    }
+
+    @Override
+    public void updateGridViewAdapter(Movie movie) {
+
     }
 
     @Override
