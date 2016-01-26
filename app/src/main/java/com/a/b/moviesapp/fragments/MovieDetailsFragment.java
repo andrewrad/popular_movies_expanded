@@ -1,14 +1,13 @@
 package com.a.b.moviesapp.fragments;
 
-import android.app.ActionBar;
 import android.app.Activity;
 import android.content.ContentValues;
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
-import android.text.Html;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -16,15 +15,11 @@ import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AbsListView;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
-import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.LinearLayout;
 import android.widget.ListAdapter;
 import android.widget.ListView;
-import android.widget.SimpleAdapter;
 import android.widget.TextView;
 import android.widget.ToggleButton;
 
@@ -38,12 +33,8 @@ import com.a.b.moviesapp.R;
 import com.a.b.moviesapp.other.RestClient;
 import com.a.b.moviesapp.pojo.ResultPOJO;
 import com.a.b.moviesapp.pojo.ReviewResult;
-import com.a.b.moviesapp.pojo.Reviews;
 import com.a.b.moviesapp.pojo.Youtube;
 import com.bumptech.glide.Glide;
-import com.google.gson.Gson;
-
-import org.w3c.dom.Text;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -67,11 +58,15 @@ public class MovieDetailsFragment extends Fragment{
     TextView mTrailersHeader;
     ListView mTrailerListView;
 
+    Call<ResultPOJO> mCall;
+
     ResultPOJO mMovieExtras;
     Movie mMovieDetails;
 
-    Boolean mCurrentlyFavorited=false;
-    private static UpdateGridView mListener;
+    MainInterface.MovieInterface mListener;
+
+//    Boolean mCurrentlyFavorited=false;
+//    private static UpdateGridView mListener;
 
     ToggleButton mFavorite;
     String TAG="MovieDetailsFragment";
@@ -93,13 +88,15 @@ public class MovieDetailsFragment extends Fragment{
         mFavorite=(ToggleButton) view.findViewById(R.id.toggleButton);
 
         populateViews();
+        setFavorites();
         return view;
     }
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setHasOptionsMenu(true);
-
+        if(!getResources().getBoolean(R.bool.isTablet)) {
+            setHasOptionsMenu(true);
+        }
     }
 
     public void populateViews(){
@@ -123,19 +120,18 @@ public class MovieDetailsFragment extends Fragment{
             mRating.setText(String.valueOf(mMovieDetails.getRating()));
             mSummary.setText(mMovieDetails.getSummary());
 
-//            mFavorite.setOnClickListener(new View.OnClickListener() {
-//                @Override
-//                public void onClick(View v) {
-//                    Log.e(TAG,"star clicked");
-//                    if (mFavorite.getDrawable().getConstantState().equals(getResources().getDrawable(android.R.drawable.star_big_on).getConstantState())) {
-//                        mFavorite.setImageResource(android.R.drawable.star_big_off);
-//                    } else {
-//                        mFavorite.setImageResource(android.R.drawable.star_big_on);
-//                    }
-//                }
-//            });
-
             getTrailersAndReviews(mMovieDetails.getId());
+        }
+    }
+    public void  setFavorites(){
+        String[]column=new String[]{Constants.FAVORITED};
+        String[]selection=new String[]{mMovieDetails.getMovieTitle()};
+        Cursor c= getContext().getContentResolver().query(Uri.parse(Constants.CONTENT_AUTHORITY+"/get_favorite"),column,Constants.TITLE+" = ? " ,selection,null);
+        if(c.getCount()>0) {
+            c.moveToFirst();
+            Log.e(TAG, "favorite? " + c.getString(0));
+            Boolean checked=c.getInt(0)==1?Boolean.TRUE:Boolean.FALSE;
+            mFavorite.setChecked(checked);
         }
     }
     public void getTrailersAndReviews(Integer id){
@@ -146,9 +142,9 @@ public class MovieDetailsFragment extends Fragment{
 //        ApiInterface service = client.create(ApiInterface.class);
 
         ApiInterface service=RestClient.getClient();
-        Call<ResultPOJO> call = service.getMovieExtras(String.valueOf(id));
-//        Call<ResultPOJO> call=service.getUsersNamedTom("tom");
-        call.enqueue(new Callback<ResultPOJO>() {
+        mCall = service.getMovieExtras(String.valueOf(id));
+//        Call<ResultPOJO> mCall=service.getUsersNamedTom("tom");
+        mCall.enqueue(new Callback<ResultPOJO>() {
             @Override
             public void onResponse(Response<ResultPOJO> response) {
                 Log.e(TAG, "Response code: " + response.code());
@@ -168,18 +164,18 @@ public class MovieDetailsFragment extends Fragment{
 //                    final Youtube trailer = result.getTrailers().getYoutube().get(0);
 //                    Log.e(TAG, "youtube address: https://www.youtube.com/watch?v=" + trailer.getSource());
 
-                    final List<Youtube> trail=mMovieExtras.getTrailers().getYoutube();
+                    final List<Youtube> trail = mMovieExtras.getTrailers().getYoutube();
                     mTrailersHeader.setText(trail.size() > 1 ? "Movie Trailers" : "Movie Trailer");
 
-                    List<String> trailers=new ArrayList<String>();
-                    for(int i=0;i<trail.size();i++){
+                    List<String> trailers = new ArrayList<String>();
+                    for (int i = 0; i < trail.size(); i++) {
                         trailers.add(trail.get(i).getName());
 //                        Log.e(TAG,"trailer "+i+": "+trail.get(i).getName());
                     }
 
                     mTrailerListView.setItemsCanFocus(false);
 
-                    ArrayAdapter sa = new ArrayAdapter(getActivity(),R.layout.trailer_button, trailers);
+                    ArrayAdapter sa = new ArrayAdapter(getActivity(), R.layout.trailer_button, trailers);
                     mTrailerListView.setAdapter(sa);
                     mTrailerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                         @Override
@@ -240,6 +236,9 @@ public class MovieDetailsFragment extends Fragment{
     @Override
     public void onPause() {
         super.onPause();
+
+        mCall.cancel();
+
         Log.e(TAG, "onPause, toggleview is set to: " + mFavorite.isChecked());
 
         if(mFavorite.isChecked()) {
@@ -268,8 +267,8 @@ public class MovieDetailsFragment extends Fragment{
             int deleted=getContext().getContentResolver().delete(Uri.parse(Constants.CONTENT_AUTHORITY + "/delete"),String.valueOf(mMovieDetails.getId()),null);
             Log.e(TAG, "Deleted "+deleted+" movie");
             if(deleted>0) {
-//                mListener.updateGridView();
-                EventBus.getDefault().postSticky(new RefreshGridView());
+                mListener.deleteMovie();
+//                EventBus.getDefault().postSticky(new RefreshGridView());
             }
         }
     }
@@ -284,20 +283,21 @@ public class MovieDetailsFragment extends Fragment{
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.menu_item_back) {
-            getActivity().getSupportFragmentManager().popBackStack();
+//            getActivity().getSupportFragmentManager().popBackStack();
+            mListener.backToMovieList();
         }
         return super.onOptionsItemSelected(item);
     }
-//    @Override
-//    public void onAttach(Activity activity) {
-//        super.onAttach(activity);
-//        // Verify that the host activity implements the callback interface
-//        try {
-//            // Instantiate the NoticeDialogListener so we can send events to the host
-//            mListener = (MainInterface.MovieInterface) activity;
-//        } catch (ClassCastException e) {
-//            throw new ClassCastException(activity.toString()
-//                    + " must implement NoticeDialogListener");
-//        }
-//    }
+    @Override
+    public void onAttach(Activity activity) {
+        super.onAttach(activity);
+        // Verify that the host activity implements the callback interface
+        try {
+            // Instantiate the NoticeDialogListener so we can send events to the host
+            mListener = (MainInterface.MovieInterface) activity;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(activity.toString()
+                    + " must implement NoticeDialogListener");
+        }
+    }
 }

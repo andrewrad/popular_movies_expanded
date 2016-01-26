@@ -24,6 +24,7 @@ public class DataProvider extends ContentProvider {
         match.addURI(Constants.AUTHORITY,"insert",1);
         match.addURI(Constants.AUTHORITY, "get_stored_movies", 2);
         match.addURI(Constants.AUTHORITY, "delete",3);
+        match.addURI(Constants.AUTHORITY, "get_favorite", 4);
         return match;
     }
 
@@ -44,6 +45,9 @@ public class DataProvider extends ContentProvider {
                 Log.e(TAG,"case 2");
 //                cursor=mOpenHelper.getReadableDatabase().query(Constants.TABLE_NAME,null,null,null,null,null,Constants.DATE);
                 cursor=mOpenHelper.getReadableDatabase().query(Constants.TABLE_NAME,null,null,null,null,null,null);
+                break;
+            case 4:
+                cursor=mOpenHelper.getReadableDatabase().query(Constants.TABLE_NAME,projection,selection,selectionArgs,null,null,null);
                 break;
         }
 
@@ -67,13 +71,16 @@ public class DataProvider extends ContentProvider {
 
         switch (mMatcher.match(uri)){
             case 1:
-                Long row=db.insert(Constants.TABLE_NAME,null,values);
-                if ( row > 0 ) {
+                Long row= null;
+
+                row = db.insertWithOnConflict(Constants.TABLE_NAME,null,values,SQLiteDatabase.CONFLICT_IGNORE);
+
+//                if ( row > 0 ) {
                     Log.e(TAG, "inserted row: " + row);
                     returnUri = uri;
-                }else {
-                    throw new android.database.SQLException("Failed to insert row into " + uri);
-                }
+//                }else {
+//                    throw new android.database.SQLException("Failed to insert row into " + uri);
+//                }
                 break;
         }
         return returnUri;

@@ -3,6 +3,7 @@ package com.a.b.moviesapp;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Point;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -46,9 +47,14 @@ public class GridViewAdapter extends RecyclerView.Adapter <GridViewAdapter.MyVie
         float px = marginFloat * (metrics.densityDpi / 160f);
         Integer marginInt=Math.round(px);
 
-        Integer height=3 * ((point.x / 2) -(marginInt * 2))/2;
+        Integer height;
+        if(mContext.getResources().getBoolean(R.bool.isTablet)) {
+            height=3 * ((point.x / 2) -(marginInt * 3))/6;
+        }else{
+            height=3 * ((point.x / 2) -(marginInt * 2))/2;
+        }
 
-//        Log.e(TAG, "display metrics: " + point.x + ", y: " + point.y+", PicHeight: "+height);
+        Log.e(TAG, "display metrics: " + point.x + ", y: " + point.y+", PicHeight: "+height+", marginInt: "+marginInt);
         return height;
     }
 
@@ -78,9 +84,14 @@ public class GridViewAdapter extends RecyclerView.Adapter <GridViewAdapter.MyVie
 //        Log.e(TAG,"onBindViewHolder: ")
             Glide.with(mContext)
                     .load(fullUrl)
-//            .placeholder(R.drawable.placeholder_vertical)
+                    .placeholder(R.drawable.placeholder_vertical)
                     .crossFade(500)
 //             .error(R.drawable.user_placeholder_error)
+                    .into(holder.mImageView);
+        }else{
+            Log.e(TAG,"onBindViewHolder NULL");
+            Glide.with(mContext)
+                    .load(R.drawable.placeholder_vertical)
                     .into(holder.mImageView);
         }
     }

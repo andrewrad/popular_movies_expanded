@@ -1,7 +1,6 @@
 package com.a.b.moviesapp.fragments;
 
 import android.app.Activity;
-import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -23,7 +22,6 @@ import com.a.b.moviesapp.other.Constants;
 import com.a.b.moviesapp.GridViewAdapter;
 import com.a.b.moviesapp.other.MainInterface;
 import com.a.b.moviesapp.other.RefreshGridView;
-import com.a.b.moviesapp.other.UpdateGridView;
 import com.a.b.moviesapp.pojo.Movie;
 import com.a.b.moviesapp.R;
 import com.a.b.moviesapp.RecyclerClickListener;
@@ -39,7 +37,6 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.List;
 
 import de.greenrobot.event.EventBus;
 
@@ -55,7 +52,11 @@ public class MovieListFragment extends Fragment implements RecyclerClickListener
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.grid_fragment, container, false);
 
-        mLayout = new GridLayoutManager(getActivity(), 2);
+        if(getResources().getBoolean(R.bool.isTablet)) {
+            mLayout = new GridLayoutManager(getActivity(), 3);
+        }else{
+            mLayout = new GridLayoutManager(getActivity(), 2);
+        }
         mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(mLayout);
@@ -91,6 +92,7 @@ public class MovieListFragment extends Fragment implements RecyclerClickListener
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
+
         if (id == R.id.menu_item_popular_sort) {
             getMovies(Constants.MOST_POPULAR);
             ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(R.string.action_popular_sort);
@@ -102,6 +104,7 @@ public class MovieListFragment extends Fragment implements RecyclerClickListener
             getFavorites();
             ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(R.string.action_favorited);
         }
+        mListener.holdOldTitle();
         return super.onOptionsItemSelected(item);
     }
     public void getFavorites(){
@@ -123,7 +126,7 @@ public class MovieListFragment extends Fragment implements RecyclerClickListener
                     m.setDate(cursor.getString(cursor.getColumnIndex(Constants.DATE)));
                     m.setRating(cursor.getDouble(cursor.getColumnIndex(Constants.RATING)));
                     m.setSummary(cursor.getString(cursor.getColumnIndex(Constants.OVERVIEW)));
-                    m.setFavotite(cursor.getInt(cursor.getColumnIndex(Constants.FAVORITED)) == 1 ? Boolean.TRUE : Boolean.FALSE);
+                    m.setFavorite(cursor.getInt(cursor.getColumnIndex(Constants.FAVORITED)) == 1 ? Boolean.TRUE : Boolean.FALSE);
 
                     //                Constants.TRAILERS
                     //                Constants.REVIEWS
@@ -137,6 +140,7 @@ public class MovieListFragment extends Fragment implements RecyclerClickListener
                 mRecyclerView.scrollToPosition(0);
 
         }else{
+            mMovieArray=null;
             mGridViewAdapter.setList(null);
             Toast.makeText(getActivity(),"No Movies Favorited",Toast.LENGTH_SHORT).show();
         }
@@ -176,7 +180,7 @@ public class MovieListFragment extends Fragment implements RecyclerClickListener
 //        if(c!=null&&c.getCount()>0) {
 //            do {
 //                Movie mv=new Movie();
-//                mv.setFavotite(c.getString());
+//                mv.setFavorite(c.getString());
 //
 //            } while (c.moveToNext())
 //

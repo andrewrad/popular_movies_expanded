@@ -8,6 +8,9 @@ import com.a.b.moviesapp.pojo.Movie;
 public class MainInterface {
     public interface MovieInterface{
         void openDetailFragment(Movie movie);
-        void updateGridViewAdapter(Movie movie);
+//        void updateGridViewAdapter(Movie movie);
+        void holdOldTitle();
+        void backToMovieList();
+        void deleteMovie();
     }
 }

@@ -43,13 +43,13 @@ public class Movie implements Parcelable {
         dest.writeString(mBackDropUrl);
         dest.writeString(mDate);
         dest.writeDouble(mVoteAverage);
-        dest.writeByte((byte)(mFavorited?1:0));
+//        dest.writeByte((byte)(mFavorited?1:0));
 
         dest.writeString(mIso6391);
         dest.writeString(mKey);
         dest.writeString(mName);
         dest.writeString(mSite);
-        dest.writeInt(mSize);
+//        dest.writeInt(mSize);
         dest.writeString(mType);
 
     }
@@ -61,13 +61,13 @@ public class Movie implements Parcelable {
         mBackDropUrl=source.readString();
         mDate=source.readString();
         mVoteAverage=source.readDouble();
-        mFavorited=source.readByte()!=0;
+//        mFavorited=source.readByte()!=0;
 
         mIso6391=source.readString();
         mKey=source.readString();
         mName=source.readString();
         mSite=source.readString();
-        mSize=source.readInt();
+//        mSize=source.readInt();
         mType=source.readString();
 
     }
@@ -125,7 +125,7 @@ public class Movie implements Parcelable {
         mVoteAverage=rating;
     }
     public Boolean getFavorite(){return mFavorited;}
-    public void setFavotite(Boolean favorite){mFavorited=favorite;}
+    public void setFavorite(Boolean favorite){mFavorited=favorite;}
 
 
 
@@ -162,13 +162,13 @@ public class Movie implements Parcelable {
         this.mSite = site;
     }
 
-    public Integer getSize() {
-        return mSize;
-    }
+//    public Integer getSize() {
+//        return mSize;
+//    }
 
-    public void setSize(Integer size) {
-        this.mSize = size;
-    }
+//    public void setSize(Integer size) {
+//        this.mSize = size;
+//    }
 
     public String getType() {
         return mType;
