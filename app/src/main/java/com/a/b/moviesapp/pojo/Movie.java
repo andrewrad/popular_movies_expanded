@@ -3,6 +3,8 @@ package com.a.b.moviesapp.pojo;
 import android.os.Parcel;
 import android.os.Parcelable;
 
+import java.util.List;
+
 /**
  * Created by Andrew on 1/1/2015.
  */
@@ -16,12 +18,15 @@ public class Movie implements Parcelable {
     public Double mVoteAverage;
     public Boolean mFavorited;
 
-    private String mIso6391;
-    private String mKey;
-    private String mName;
-    private String mSite;
-    private Integer mSize;
-    private String mType;
+    public String mIso6391;
+    public String mKey;
+    public String mName;
+    public String mSite;
+    public Integer mSize;
+    public String mType;
+
+    public List<Youtube> mTrailers;
+    public List<ReviewResult> mReviews;
 
     public Movie(){
     }
@@ -49,10 +54,12 @@ public class Movie implements Parcelable {
         dest.writeString(mKey);
         dest.writeString(mName);
         dest.writeString(mSite);
-//        dest.writeInt(mSize);
+//        dest.writeInt(size);
         dest.writeString(mType);
-
+        dest.writeTypedList(mTrailers);
+        dest.writeTypedList(mReviews);
     }
+
     public void readFromParcel(Parcel source){
         mId=source.readInt();
         mTitle=source.readString();
@@ -67,8 +74,10 @@ public class Movie implements Parcelable {
         mKey=source.readString();
         mName=source.readString();
         mSite=source.readString();
-//        mSize=source.readInt();
+//        size=source.readInt();
         mType=source.readString();
+        source.readTypedList(mTrailers, (Creator<Youtube>) Youtube.class.getClassLoader());
+        source.readTypedList(mReviews, (Creator<ReviewResult>) ReviewResult.class.getClassLoader());
 
     }
     private final Parcelable.Creator<Movie>CREATOR=new Parcelable.Creator<Movie>(){
@@ -127,6 +136,20 @@ public class Movie implements Parcelable {
     public Boolean getFavorite(){return mFavorited;}
     public void setFavorite(Boolean favorite){mFavorited=favorite;}
 
+    public void setTrailer(List<Youtube> trailers){
+        mTrailers=trailers;
+    }
+    public List<Youtube> getTrailers(){
+        return mTrailers;
+    }
+
+    public void setReviews(List<ReviewResult> reviews){
+        mReviews=reviews;
+    }
+    public List<ReviewResult> getReviews(){
+        return mReviews;
+    }
+
 
 
 
@@ -147,11 +170,11 @@ public class Movie implements Parcelable {
     }
 
 //    public String getName() {
-//        return mName;
+//        return name;
 //    }
 
 //    public void setName(String name) {
-//        this.mName = name;
+//        this.name = name;
 //    }
 
     public String getSite() {
@@ -163,11 +186,11 @@ public class Movie implements Parcelable {
     }
 
 //    public Integer getSize() {
-//        return mSize;
+//        return size;
 //    }
 
 //    public void setSize(Integer size) {
-//        this.mSize = size;
+//        this.size = size;
 //    }
 
     public String getType() {

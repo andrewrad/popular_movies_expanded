@@ -2,6 +2,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:context=".activities.MainActivity">
 
-    <item android:id="@+id/menu_item_back"
-        android:title="@string/list_movies"/>
+    <item android:id="@+id/menu_item_share"
+        android:title="@string/share_movie_trailer"/>
 </menu>

@@ -59,9 +59,8 @@ public class MainActivity extends AppCompatActivity implements MainInterface.Mov
         bundle.putParcelable(Constants.DETAILS_BUNDLE, movie);
         movieDetailsFragment.setArguments(bundle);
 
-        boolean tabletSize = getResources().getBoolean(R.bool.isTablet);
         FragmentTransaction ft=getSupportFragmentManager().beginTransaction();
-        if(tabletSize){
+        if(getResources().getBoolean(R.bool.isTablet)){
             ft.replace(R.id.fragment_container2, movieDetailsFragment);
             ft.addToBackStack(null);
             ft.commit();
@@ -84,8 +83,8 @@ public class MainActivity extends AppCompatActivity implements MainInterface.Mov
 
     @Override
     public void deleteMovie() {
-        Log.e(TAG,"mTitle: "+mToolBarTitle+", "+getString(R.string.action_favorited));
-        Log.e(TAG, "deleteMovie, title=fav? "+mToolBarTitle.equals(getString(R.string.action_favorited)));
+//        Log.e(TAG,"mTitle: "+mToolBarTitle+", "+getString(R.string.action_favorited));
+//        Log.e(TAG, "deleteMovie, title=fav? "+mToolBarTitle.equals(getString(R.string.action_favorited)));
         if(mToolBarTitle.equals(getString(R.string.action_favorited))){
             mMainFragment.getFavorites();
         }
@@ -93,10 +92,14 @@ public class MainActivity extends AppCompatActivity implements MainInterface.Mov
 
     @Override
     public void onBackPressed() {
-        if (backPressedToExitOnce) {
-            super.onBackPressed();
-        }
-        if (fragmentManager.getBackStackEntryCount() > 0) {
+//        if (backPressedToExitOnce) {
+//            super.onBackPressed();
+//            super.onBackPressed();
+//        }
+        Integer endBackPressed=getResources().getBoolean(R.bool.isTablet)==Boolean.TRUE?1:0;
+        Log.e(TAG,"backpressed istablet?: "+endBackPressed+", fragmentManager.getBackStackEntryCount(): "+fragmentManager.getBackStackEntryCount());
+
+        if (fragmentManager.getBackStackEntryCount() > endBackPressed) {
 //            CharSequence oldTitle=mToolbar.getTitle();
 //            Log.e(TAG,"old title: "+String.valueOf(oldTitle));
             fragmentManager.popBackStack();
@@ -108,9 +111,13 @@ public class MainActivity extends AppCompatActivity implements MainInterface.Mov
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    backPressedToExitOnce = false;
+//                    backPressedToExitOnce = false;
+                    exitApp();
                 }
             }, 2000);
         }
+    }
+    private void exitApp(){
+        this.finishAffinity();
     }
 }

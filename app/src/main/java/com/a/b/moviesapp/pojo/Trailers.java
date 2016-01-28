@@ -7,16 +7,8 @@ import java.util.List;
  * Created by Andrew on 1/20/2016.
  */
 public class Trailers {
-    private List<Object> quicktime = new ArrayList<Object>();
+//    private List<Object> quicktime = new ArrayList<Object>();
     private List<Youtube> youtube = new ArrayList<Youtube>();
-
-    public List<Object> getQuicktime() {
-        return quicktime;
-    }
-
-    public void setQuicktime(List<Object> quicktime) {
-        this.quicktime = quicktime;
-    }
 
     public List<Youtube> getYoutube() {
         return youtube;
@@ -25,4 +17,14 @@ public class Trailers {
     public void setYoutube(List<Youtube> youtube) {
         this.youtube = youtube;
     }
+
+//    }
+
+    //    public List<Object> getQuicktime() {
+//        return quicktime;
+//    }
+//
+//    public void setQuicktime(List<Object> quicktime) {
+//        this.quicktime = quicktime;
+
 }

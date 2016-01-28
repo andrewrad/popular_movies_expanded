@@ -25,6 +25,9 @@ import com.a.b.moviesapp.other.RefreshGridView;
 import com.a.b.moviesapp.pojo.Movie;
 import com.a.b.moviesapp.R;
 import com.a.b.moviesapp.RecyclerClickListener;
+import com.a.b.moviesapp.pojo.ReviewResult;
+import com.a.b.moviesapp.pojo.Reviews;
+import com.a.b.moviesapp.pojo.Youtube;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -37,6 +40,7 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.ArrayList;
+import java.util.List;
 
 import de.greenrobot.event.EventBus;
 
@@ -52,11 +56,23 @@ public class MovieListFragment extends Fragment implements RecyclerClickListener
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.grid_fragment, container, false);
 
+//        DisplayMetrics metrics=new DisplayMetrics();
+//        getActivity().getWindowManager().getDefaultDisplay().getMetrics(metrics);
+//        int widthPx=metrics.widthPixels;
+//        float scaleFactor=metrics.density;
+//        float widthDp=widthPx/scaleFactor;
+//        Log.e(TAG,"widthDp: "+widthDp+", scale density: "+metrics.density);
+//        if(widthDp>600){
+//            mLayout=new GridLayoutManager(getActivity(),3);
+//        }else{
+//            mLayout=new GridLayoutManager(getActivity(),2);
+//        }
         if(getResources().getBoolean(R.bool.isTablet)) {
             mLayout = new GridLayoutManager(getActivity(), 3);
         }else{
             mLayout = new GridLayoutManager(getActivity(), 2);
         }
+
         mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(mLayout);
@@ -108,36 +124,133 @@ public class MovieListFragment extends Fragment implements RecyclerClickListener
         return super.onOptionsItemSelected(item);
     }
     public void getFavorites(){
-        Log.e(TAG,"getFavorites");
+        Log.e(TAG, "getFavorites");
         String[] selection=new String[]{Constants.TITLE};
         Cursor cursor = getContext().getContentResolver().query(Uri.parse(Constants.CONTENT_AUTHORITY+"/get_stored_movies"),null,null,null,null);
         if(cursor!=null&& cursor.getCount()>0) {
-                cursor.moveToFirst();
-                ArrayList<Movie> movies = new ArrayList<>();
-                do {
-                    Log.e(TAG, "getFavorites: " + cursor.getString(1));
+            cursor.moveToFirst();
+            ArrayList<Movie> movies = new ArrayList<>();
+            do {
+                Log.e(TAG, "getFavorites: " + cursor.getString(1));
 
-                    Movie m = new Movie();
+                Movie m = new Movie();
 
-                    m.setId(cursor.getInt(cursor.getColumnIndex(Constants.MOVIE_ID)));
-                    m.setMovieTitle(cursor.getString(cursor.getColumnIndex(Constants.TITLE)));
-                    m.setPosterUrl(cursor.getString(cursor.getColumnIndex(Constants.POSTER_PATH)));
-                    m.setBackDropUrl(cursor.getString(cursor.getColumnIndex(Constants.BACKDROP_PATH)));
-                    m.setDate(cursor.getString(cursor.getColumnIndex(Constants.DATE)));
-                    m.setRating(cursor.getDouble(cursor.getColumnIndex(Constants.RATING)));
-                    m.setSummary(cursor.getString(cursor.getColumnIndex(Constants.OVERVIEW)));
-                    m.setFavorite(cursor.getInt(cursor.getColumnIndex(Constants.FAVORITED)) == 1 ? Boolean.TRUE : Boolean.FALSE);
+                m.setId(cursor.getInt(cursor.getColumnIndex(Constants.MOVIE_ID)));
+                m.setMovieTitle(cursor.getString(cursor.getColumnIndex(Constants.TITLE)));
+                m.setPosterUrl(cursor.getString(cursor.getColumnIndex(Constants.POSTER_PATH)));
+                m.setBackDropUrl(cursor.getString(cursor.getColumnIndex(Constants.BACKDROP_PATH)));
+                m.setDate(cursor.getString(cursor.getColumnIndex(Constants.DATE)));
+                m.setRating(cursor.getDouble(cursor.getColumnIndex(Constants.RATING)));
+                m.setSummary(cursor.getString(cursor.getColumnIndex(Constants.OVERVIEW)));
+                m.setFavorite(cursor.getInt(cursor.getColumnIndex(Constants.FAVORITED)) == 1 ? Boolean.TRUE : Boolean.FALSE);
 
-                    //                Constants.TRAILERS
-                    //                Constants.REVIEWS
+                String trailers=cursor.getString(cursor.getColumnIndex(Constants.TRAILERS));
+                String reviews=cursor.getString(cursor.getColumnIndex(Constants.REVIEWS));
 
-                    movies.add(m);
-                } while (cursor.moveToNext());
-                cursor.close();
-                mMovieArray = movies;
+                Log.e(TAG,"getFavorites trailers from DB: "+trailers+", reviews: "+reviews);
 
-                mGridViewAdapter.setList(movies);
-                mRecyclerView.scrollToPosition(0);
+//                    List<Youtube> finalOutputObject = gson.fromJson(trailers, type);
+
+//                    try {
+//                        JSONObject jsonObject=new JSONObject(trailers);
+//                    } catch (JSONException e) {
+//                        e.printStackTrace();
+//                    }
+
+//                    mMovieArray = new ArrayList<Movie>();
+
+                List<Youtube> movieTrailers=new ArrayList<>();
+                try {
+                    JSONArray jsonArray = new JSONArray(trailers);
+
+                    for (int i = 0; i < jsonArray.length(); i++) {
+                        JSONObject jsonObject = jsonArray.getJSONObject(i);
+                        Youtube youTube = new Youtube();
+
+                        youTube.name = jsonObject.has("name") ? jsonObject.getString("name") : "";
+                        youTube.setSource(jsonObject.has("source") ? jsonObject.getString("source") : "");
+                        youTube.size = jsonObject.has("size") ? jsonObject.getString("size") : "";
+                        youTube.type = jsonObject.has("type") ? jsonObject.getString("type") : "";
+
+                        movieTrailers.add(youTube);
+                    }
+                    m.setTrailer(movieTrailers);
+
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+
+                List<ReviewResult> reviewResults=new ArrayList<>();
+                try {
+                    JSONObject jsonObj=new JSONObject(reviews);
+                    JSONArray jsonAry=jsonObj.has("results")?jsonObj.getJSONArray("results"):null;
+                    if(jsonAry!=null){
+                        for (int i = 0; i < jsonAry.length(); i++) {
+                            JSONObject jsonObject = jsonAry.getJSONObject(i);
+                            ReviewResult review=new ReviewResult();
+
+                            review.id = jsonObject.has("id") ? jsonObject.getString("id") : "";
+                            review.author=(jsonObject.has("author") ? jsonObject.getString("author") : "");
+                            review.content = jsonObject.has("content") ? jsonObject.getString("content") : "";
+                            review.url = jsonObject.has("url") ? jsonObject.getString("url") : "";
+
+                            reviewResults.add(review);
+                        }
+                        m.setReviews(reviewResults);
+
+                    }
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+
+
+//                List<ReviewResult> reviewResults=new ArrayList<>();
+//                try {
+//                    JSONArray jsonArray = new JSONArray(reviews);
+//                    ReviewResult review=new ReviewResult();
+//
+//                    for (int i = 0; i < jsonArray.length(); i++) {
+//                        JSONObject jsonObject = jsonArray.getJSONObject(i);
+//
+//                        review.id = jsonObject.has("id") ? jsonObject.getString("id") : "";
+//                        review.author=(jsonObject.has("author") ? jsonObject.getString("author") : "");
+//                        review.content = jsonObject.has("content") ? jsonObject.getString("content") : "";
+//                        review.url = jsonObject.has("url") ? jsonObject.getString("url") : "";
+//
+//                        reviewResults.add(review);
+//                    }
+//                    m.setReviews(reviewResults);
+//
+//                } catch (JSONException e) {
+//                    e.printStackTrace();
+//                }
+
+
+//                mMovieArray = new ArrayList<Movie>();
+//
+//                JSONObject MoviesJson = new JSONObject(JsonStr);
+//                JSONArray moviesArray = MoviesJson.has("results") ? MoviesJson.getJSONArray("results") : null;
+//                if (moviesArray != null) {
+//                    for (int i = 0; i < moviesArray.length(); i++) {
+//
+//                        JSONObject movieObj = moviesArray.getJSONObject(i);
+//                        Movie movie = new Movie();
+//
+//                        movie.mTitle = movieObj.has(Constants.TITLE) ? movieObj.getString(Constants.TITLE) : "";
+
+
+                movies.add(m);
+            } while (cursor.moveToNext());
+            cursor.close();
+            mMovieArray = movies;
+
+            mGridViewAdapter.setList(movies);
+            mRecyclerView.scrollToPosition(0);
+
+            if(getResources().getBoolean(R.bool.isTablet)) {
+                mListener.openDetailFragment(mMovieArray.get(0));
+            }
 
         }else{
             mMovieArray=null;
@@ -206,7 +319,7 @@ public class MovieListFragment extends Fragment implements RecyclerClickListener
         protected ArrayList<Movie> doInBackground(String... params) {
             HttpURLConnection urlConnection = null;
             BufferedReader reader = null;
-            String forecastJsonStr = null;
+            String jsonString = null;
             try {
 //                Log.e(TAG, "sort order: " + params.toString());
                 Uri builtUri = Uri.parse(Constants.BASE_URL).buildUpon()
@@ -236,7 +349,7 @@ public class MovieListFragment extends Fragment implements RecyclerClickListener
                 if (buffer.length() == 0) {
                     return null;
                 }
-                forecastJsonStr = buffer.toString();
+                jsonString = buffer.toString();
             } catch (IOException e) {
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
@@ -260,7 +373,7 @@ public class MovieListFragment extends Fragment implements RecyclerClickListener
                 }
             }
             try {
-                return parseJson(forecastJsonStr);
+                return parseJson(jsonString);
             } catch (JSONException e) {
                 Log.e(LOG_TAG, e.getMessage(), e);
                 e.printStackTrace();
@@ -299,6 +412,10 @@ public class MovieListFragment extends Fragment implements RecyclerClickListener
             if (mMovieArray != null) {
                 mGridViewAdapter.setList(result);
                 mRecyclerView.scrollToPosition(0);
+
+                if(getResources().getBoolean(R.bool.isTablet)) {
+                    mListener.openDetailFragment(mMovieArray.get(0));
+                }
 
 //                for (Movie m : mMovieArray) {
 //                    Log.e("onPostExecute", "movie: " + m.getMovieTitle() + ", url: " + m.getPosterUrl());

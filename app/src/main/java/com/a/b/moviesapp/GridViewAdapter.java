@@ -54,7 +54,7 @@ public class GridViewAdapter extends RecyclerView.Adapter <GridViewAdapter.MyVie
             height=3 * ((point.x / 2) -(marginInt * 2))/2;
         }
 
-        Log.e(TAG, "display metrics: " + point.x + ", y: " + point.y+", PicHeight: "+height+", marginInt: "+marginInt);
+        Log.e(TAG, "display metrics, x:" + point.x + ", y: " + point.y+", PicHeight: "+height+", marginInt: "+marginInt);
         return height;
     }
 

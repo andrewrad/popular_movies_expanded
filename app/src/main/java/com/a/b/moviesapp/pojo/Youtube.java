@@ -1,14 +1,57 @@
 package com.a.b.moviesapp.pojo;
 
+import android.os.Parcel;
+import android.os.Parcelable;
+
 /**
  * Created by Andrew on 1/20/2016.
  */
-public class Youtube {
+public class Youtube implements Parcelable{
 
-    private String name;
-    private String size;
-    private String source;
-    private String type;
+    public String name;
+    public String size;
+    public String source;
+    public String type;
+
+    public Youtube(){
+    }
+
+    public Youtube(Parcel source){
+        readFromParcel(source);
+    }
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(name);
+        dest.writeString(size);
+        dest.writeString(source);
+        dest.writeString(type);
+    }
+    public void readFromParcel(Parcel source) {
+        name = source.readString();
+        size = source.readString();
+        this.source = source.readString();
+        type = source.readString();
+    }
+
+    private final Parcelable.Creator<Youtube>CREATOR=new Parcelable.Creator<Youtube>(){
+
+        @Override
+        public Youtube createFromParcel(Parcel source) {
+            return new Youtube(source);
+        }
+
+        @Override
+        public Youtube[] newArray(int size) {
+            return new Youtube[size];
+        }
+    };
+
 
     public String getName() {
         return name;
