@@ -53,7 +53,6 @@ public class GridViewAdapter extends RecyclerView.Adapter <GridViewAdapter.MyVie
         }else{
             height=3 * ((point.x / 2) -(marginInt * 2))/2;
         }
-
 //        Log.e(TAG, "display metrics, x:" + point.x + ", y: " + point.y+", PicHeight: "+height+", marginInt: "+marginInt);
         return height;
     }
@@ -80,20 +79,16 @@ public class GridViewAdapter extends RecyclerView.Adapter <GridViewAdapter.MyVie
             Movie current = mMovies.get(position);
             String fullUrl = Constants.TMDB_IMAGE_BASE_URL_LARGE + current.getPosterUrl();
 
-            Log.e(TAG, "poster url: "+mMovies.get(position).getMovieTitle()+", "+fullUrl);
+//            Log.e(TAG, "poster url: "+mMovies.get(position).getMovieTitle()+", "+fullUrl);
 
             holder.mTitleView.setText(mMovies.get(position).getMovieTitle());
 
             Glide.with(mContext)
-                    .load(fullUrl)
-                    .placeholder(R.drawable.blank_image)
-//                    .placeholder(R.drawable.placeholder_vertical)
-                    .crossFade(400)
-//                    .error(R.drawable.blank_image)
-                    .into(holder.mImageView);
+                .load(fullUrl)
+                .placeholder(R.drawable.blank_image)
+                .crossFade(400)
+                .into(holder.mImageView);
 
-        }else{
-//            Log.e(TAG,"onBindViewHolder NULL");
         }
     }
 

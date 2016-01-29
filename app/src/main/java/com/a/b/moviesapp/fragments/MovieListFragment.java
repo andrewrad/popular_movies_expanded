@@ -241,7 +241,7 @@ public class MovieListFragment extends Fragment implements RecyclerClickListener
                     .build();
 
                 URL url = new URL(builtUri.toString());
-                Log.e("URL", "Movies URL JSON Object: " + url);
+//                Log.e("URL", "Movies URL JSON Object: " + url);
 
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
@@ -295,7 +295,7 @@ public class MovieListFragment extends Fragment implements RecyclerClickListener
             }
             return null;
         }
-        public void d(String TAG, String message) {
+        public void logMore(String TAG, String message) {
             int maxLogSize = 2000;
             for(int i = 0; i <= message.length() / maxLogSize; i++) {
                 int start = i * maxLogSize;
@@ -306,7 +306,7 @@ public class MovieListFragment extends Fragment implements RecyclerClickListener
         }
 
         private ArrayList<Movie> parseJson(String JsonStr) throws JSONException {
-            d("Json string before parsing: ",JsonStr);
+//            logMore("Json string before parsing: ",JsonStr);
 
             mMovieArray = new ArrayList<Movie>();
 

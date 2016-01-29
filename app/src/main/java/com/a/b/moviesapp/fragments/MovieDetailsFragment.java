@@ -42,10 +42,6 @@ import com.a.b.moviesapp.pojo.ReviewResult;
 import com.a.b.moviesapp.pojo.Youtube;
 import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-
-import java.lang.annotation.Target;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -142,7 +138,7 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
 //            Log.e(TAG, "background image height: " + mBackGroundImage.getMeasuredHeight());
 
             String fullUrlPoster=Constants.TMDB_IMAGE_BASE_URL_SMALL+mMovieDetails.getPosterUrl();
-            Log.e(TAG,"full url poster: "+fullUrlPoster);
+//            Log.e(TAG,"full url poster: "+fullUrlPoster);
             Glide.with(getActivity())
                 .load(fullUrlPoster)
                 .into(mPosterPic);
@@ -161,7 +157,7 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
         Cursor c= getContext().getContentResolver().query(Uri.parse(Constants.CONTENT_AUTHORITY + "/get_favorite"), column, Constants.TITLE + " = ? ", selection, null);
         if(c.getCount()>0) {
             c.moveToFirst();
-            Log.e(TAG, "favorite? " + c.getString(0));
+//            Log.e(TAG, "favorite? " + c.getString(0));
             Boolean checked=c.getInt(0)==1?Boolean.TRUE:Boolean.FALSE;
             mFavorite.setChecked(checked);
         }
@@ -173,49 +169,14 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
         mCall.enqueue(new Callback<ResultPOJO>() {
             @Override
             public void onResponse(Response<ResultPOJO> response) {
-                Log.e(TAG, "Response code: " + response.code());
+//                Log.e(TAG, "Response code: " + response.code());
                 if (response.isSuccess()) {
 //                    Log.e(TAG, "response trailers: " + response.body().getTrailers() + ", message: " + response.message());
 
                     mMovieExtras = response.body();
 
-//                    mMoreDetails = result.getId();
-
-//                    final Youtube trailer = result.getTrailers().getYoutube().get(0);
-//                    Log.e(TAG, "youtube address: https://www.youtube.com/watch?v=" + trailer.getSource());
-
-//                    final List<Youtube> trail = mMovieExtras.getTrailers().getYoutube();
                     setTrailersView(mMovieExtras.getTrailers().getYoutube());
                     mMovieDetails.setTrailer(mMovieExtras.getTrailers().getYoutube());
-//                    mTrailersHeader.setText(trail.size() > 1 ? "Movie Trailers" : "Movie Trailer");
-
-//                    List<String> trailers = new ArrayList<String>();
-//                    for (int i = 0; i < trail.size(); i++) {
-//                        trailers.add(trail.get(i).getName());
-////                        Log.e(TAG,"trailer "+i+": "+trail.get(i).getName());
-//                    }
-//
-//                    mTrailerListView.setItemsCanFocus(false);
-//                    setListViewHeight(mTrailerListView);
-//
-//                    ArrayAdapter sa = new ArrayAdapter(getActivity(), R.layout.trailer_button, trailers);
-//                    mTrailerListView.setAdapter(sa);
-//                    mTrailerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-//                        @Override
-//                        public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-////                            Log.e(TAG, "clicked " + trail.get(position).getName() + ", https://www.youtube.com/watch?v=" + trail.get(position).getSource());
-//                            startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.youtube.com/watch?v=" + trail.get(position).getSource())));
-//                        }
-//                    });
-
-//                    List<ReviewResult> rev = mMovieExtras.getReviews().getResults();
-//                    String reviews = "";
-//                    for (ReviewResult r : rev) {
-//                        reviews += "Movie Review from " + r.getAuthor() + ": \n\n" +
-//                                r.getContent() + "\n\n\n";
-//                    }
-//
-//                    mReviews.setText(reviews);
 
                     setReviewsView(mMovieExtras.getReviews().getResults());
                     mMovieDetails.setReviews(mMovieExtras.getReviews().getResults());
@@ -236,7 +197,7 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
     }
     public void setTrailersView(final List<Youtube> trail){
         if(trail!=null&&trail.size()>0) {
-            mTrailersHeader.setText(trail.size() > 1 ? "Movie Trailers" : "Movie Trailer");
+            mTrailersHeader.setText(trail.size() > 1 ? "Movie Trailers:" : "Movie Trailer:");
 
             List<String> trailers = new ArrayList<String>();
             for (int i = 0; i < trail.size(); i++) {
@@ -252,7 +213,6 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
             mTrailerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                 @Override
                 public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-//                            Log.e(TAG, "clicked " + trail.get(position).getName() + ", https://www.youtube.com/watch?v=" + trail.get(position).getSource());
                     startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.youtube.com/watch?v=" + trail.get(position).getSource())));
                 }
             });
@@ -277,7 +237,7 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
     }
 
     public void setReviewsView(List<ReviewResult> review){
-        Log.e(TAG, "setReviewsView: " + review);
+//        Log.e(TAG, "setReviewsView: " + review);
         if(review!=null) {
             String reviews = "";
             for (ReviewResult r : review) {
@@ -294,7 +254,7 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
     public void onPause() {
         super.onPause();
         mCall.cancel();
-        Log.e(TAG, "onPause, toggleview is set to: " + mFavorite.isChecked());
+//        Log.e(TAG, "onPause, toggleview is set to: " + mFavorite.isChecked());
 
         if(!getResources().getBoolean(R.bool.isTablet)){
             if (mFavorite.isChecked()) {
@@ -348,20 +308,17 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
         if (id == R.id.menu_item_share) {
-//            if(mMovieExtras!=null) {
-//                List<Youtube> trailers = mMovieExtras.getTrailers().getYoutube();
-                List<Youtube> trailers = mMovieDetails.getTrailers();
-                if (trailers.size() > 0) {
-                    Intent sendIntent = new Intent();
-                    sendIntent.setAction(Intent.ACTION_SEND);
-                    sendIntent.putExtra(Intent.EXTRA_TEXT, "http://www.youtube.com/watch?v=" + trailers.get(0).getSource());
-                    sendIntent.setType("text/plain");
-                    startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.share_movie_trailer)));
-                } else {
-                    Toast.makeText(getActivity(), R.string.no_trailer_to_share, Toast.LENGTH_SHORT).show();
-                }
+            List<Youtube> trailers = mMovieDetails.getTrailers();
+            if (trailers.size() > 0) {
+                Intent sendIntent = new Intent();
+                sendIntent.setAction(Intent.ACTION_SEND);
+                sendIntent.putExtra(Intent.EXTRA_TEXT, "http://www.youtube.com/watch?v=" + trailers.get(0).getSource());
+                sendIntent.setType("text/plain");
+                startActivity(Intent.createChooser(sendIntent, getResources().getText(R.string.share_movie_trailer)));
+            } else {
+                Toast.makeText(getActivity(), R.string.no_trailer_to_share, Toast.LENGTH_SHORT).show();
             }
-//        }
+        }
         return super.onOptionsItemSelected(item);
     }
     @Override

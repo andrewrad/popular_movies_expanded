@@ -1,6 +1,5 @@
 package com.a.b.moviesapp.activities;
 
-import android.app.Fragment;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.FragmentManager;
@@ -42,18 +41,10 @@ public class MainActivity extends AppCompatActivity implements MainInterface.Mov
             mMainFragment=(MovieListFragment) getSupportFragmentManager().getFragment(savedInstanceState,"mMainFragment");
 
         }
-//        boolean tabletSize = getResources().getBoolean(R.bool.isTablet);
-//        Log.e(TAG, "TabletSize: "+tabletSize);
-//        if(tabletSize){
-//            MovieDetailsFragment movieDetailsFragment=new MovieDetailsFragment();
-//            FragmentTransaction ft = fragmentManager.beginTransaction();
-//            ft.replace(R.id.fragment_container2, movieDetailsFragment).commit();
-//        }
     }
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-
         getSupportFragmentManager().putFragment(outState, "mMainFragment", (MovieListFragment) mMainFragment);
     }
 
@@ -81,10 +72,6 @@ public class MainActivity extends AppCompatActivity implements MainInterface.Mov
         mToolBarTitle=getSupportActionBar().getTitle();
     }
 
-    @Override
-    public void backToMovieList() {
-        onBackPressed();
-    }
 
     @Override
     public void deleteMovie() {
@@ -99,7 +86,7 @@ public class MainActivity extends AppCompatActivity implements MainInterface.Mov
             super.onBackPressed();
         }
         Integer endBackPressed=getResources().getBoolean(R.bool.isTablet)==Boolean.TRUE?1:0;
-        Log.e(TAG,"backpressed istablet?: "+endBackPressed+", fragmentManager.getBackStackEntryCount(): "+fragmentManager.getBackStackEntryCount());
+//        Log.e(TAG,"backpressed istablet?: "+endBackPressed+", fragmentManager.getBackStackEntryCount(): "+fragmentManager.getBackStackEntryCount());
 
         if (fragmentManager.getBackStackEntryCount() > endBackPressed) {
             fragmentManager.popBackStack();

@@ -71,15 +71,9 @@ public class DataProvider extends ContentProvider {
         switch (mMatcher.match(uri)){
             case 1:
                 Long row= null;
-
                 row = db.insertWithOnConflict(Constants.TABLE_NAME,null,values,SQLiteDatabase.CONFLICT_IGNORE);
-
-//                if ( row > 0 ) {
-                    Log.e(TAG, "inserted row: " + row);
-                    returnUri = uri;
-//                }else {
-//                    throw new android.database.SQLException("Failed to insert row into " + uri);
-//                }
+                Log.e(TAG, "inserted row: " + row);
+                returnUri = uri;
                 break;
         }
         return returnUri;
