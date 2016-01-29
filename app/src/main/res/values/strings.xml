@@ -12,6 +12,7 @@
     <string name="title_activity_detail">DetailActivity</string>
     <string name="backpress">Press Again to Exit</string>
     <string name="share_movie_trailer">Share Movie Trailer</string>
+    <string name="no_movies_favorited">No Movies Favorited</string>
     <string name="no_trailer_to_share">No trailer to share</string>
     <string name="dead_network">Please check network connection</string>
 

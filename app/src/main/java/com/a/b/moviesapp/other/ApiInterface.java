@@ -26,14 +26,14 @@ public interface ApiInterface {
 //    @GET("/search/users")
 //    Call<Movie> getUsersNamedTom(@Query("q") String name);
 
-    @POST("/user/create")
-//    Call<Item> createUser(@Body String name, @Body String email);
-
-    @PUT("/user/{id}/update")
-    Call<ClipData.Item> updateUser(@Path("id") String id , @Body ClipData.Item user);
-
-    @Headers("User-Agent: Retrofit2.0Tutorial-App")
-    @GET("/search/users")
-    Call<ResultPOJO> getUsersNamedTom(@Query("q") String name);
+//    @POST("/user/create")
+////    Call<Item> createUser(@Body String name, @Body String email);
+//
+//    @PUT("/user/{id}/update")
+//    Call<ClipData.Item> updateUser(@Path("id") String id , @Body ClipData.Item user);
+//
+//    @Headers("User-Agent: Retrofit2.0Tutorial-App")
+//    @GET("/search/users")
+//    Call<ResultPOJO> getUsersNamedTom(@Query("q") String name);
 
 }

@@ -1,5 +1,6 @@
 package com.a.b.moviesapp.activities;
 
+import android.app.Fragment;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.v4.app.FragmentManager;
@@ -9,16 +10,12 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.a.b.moviesapp.GridViewAdapter;
 import com.a.b.moviesapp.other.Constants;
 import com.a.b.moviesapp.other.MainInterface;
-import com.a.b.moviesapp.other.RefreshGridView;
 import com.a.b.moviesapp.pojo.Movie;
 import com.a.b.moviesapp.R;
 import com.a.b.moviesapp.fragments.MovieListFragment;
 import com.a.b.moviesapp.fragments.MovieDetailsFragment;
-
-import de.greenrobot.event.EventBus;
 
 public class MainActivity extends AppCompatActivity implements MainInterface.MovieInterface{
     String TAG="MainActivity";
@@ -41,6 +38,9 @@ public class MainActivity extends AppCompatActivity implements MainInterface.Mov
             mMainFragment=new MovieListFragment();
             FragmentTransaction ft = fragmentManager.beginTransaction();
             ft.replace(R.id.fragment_container, mMainFragment).commit();
+        }else{
+            mMainFragment=(MovieListFragment) getSupportFragmentManager().getFragment(savedInstanceState,"mMainFragment");
+
         }
 //        boolean tabletSize = getResources().getBoolean(R.bool.isTablet);
 //        Log.e(TAG, "TabletSize: "+tabletSize);
@@ -49,6 +49,12 @@ public class MainActivity extends AppCompatActivity implements MainInterface.Mov
 //            FragmentTransaction ft = fragmentManager.beginTransaction();
 //            ft.replace(R.id.fragment_container2, movieDetailsFragment).commit();
 //        }
+    }
+    @Override
+    protected void onSaveInstanceState(Bundle outState) {
+        super.onSaveInstanceState(outState);
+
+        getSupportFragmentManager().putFragment(outState, "mMainFragment", (MovieListFragment) mMainFragment);
     }
 
     @Override
@@ -62,7 +68,6 @@ public class MainActivity extends AppCompatActivity implements MainInterface.Mov
         FragmentTransaction ft=getSupportFragmentManager().beginTransaction();
         if(getResources().getBoolean(R.bool.isTablet)){
             ft.replace(R.id.fragment_container2, movieDetailsFragment);
-            ft.addToBackStack(null);
             ft.commit();
         }else{
             ft.replace(R.id.fragment_container, movieDetailsFragment);
@@ -83,8 +88,6 @@ public class MainActivity extends AppCompatActivity implements MainInterface.Mov
 
     @Override
     public void deleteMovie() {
-//        Log.e(TAG,"mTitle: "+mToolBarTitle+", "+getString(R.string.action_favorited));
-//        Log.e(TAG, "deleteMovie, title=fav? "+mToolBarTitle.equals(getString(R.string.action_favorited)));
         if(mToolBarTitle.equals(getString(R.string.action_favorited))){
             mMainFragment.getFavorites();
         }
@@ -92,16 +95,13 @@ public class MainActivity extends AppCompatActivity implements MainInterface.Mov
 
     @Override
     public void onBackPressed() {
-//        if (backPressedToExitOnce) {
-//            super.onBackPressed();
-//            super.onBackPressed();
-//        }
+        if (backPressedToExitOnce) {
+            super.onBackPressed();
+        }
         Integer endBackPressed=getResources().getBoolean(R.bool.isTablet)==Boolean.TRUE?1:0;
         Log.e(TAG,"backpressed istablet?: "+endBackPressed+", fragmentManager.getBackStackEntryCount(): "+fragmentManager.getBackStackEntryCount());
 
         if (fragmentManager.getBackStackEntryCount() > endBackPressed) {
-//            CharSequence oldTitle=mToolbar.getTitle();
-//            Log.e(TAG,"old title: "+String.valueOf(oldTitle));
             fragmentManager.popBackStack();
             mToolbar.setTitle(mToolBarTitle);
 
@@ -111,13 +111,9 @@ public class MainActivity extends AppCompatActivity implements MainInterface.Mov
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
-//                    backPressedToExitOnce = false;
-                    exitApp();
+                    backPressedToExitOnce = false;
                 }
             }, 2000);
         }
-    }
-    private void exitApp(){
-        this.finishAffinity();
     }
 }

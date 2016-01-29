@@ -43,7 +43,6 @@ public class DataProvider extends ContentProvider {
         switch (mMatcher.match(uri)){
             case 2:
                 Log.e(TAG,"case 2");
-//                cursor=mOpenHelper.getReadableDatabase().query(Constants.TABLE_NAME,null,null,null,null,null,Constants.DATE);
                 cursor=mOpenHelper.getReadableDatabase().query(Constants.TABLE_NAME,null,null,null,null,null,null);
                 break;
             case 4:

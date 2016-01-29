@@ -3,7 +3,6 @@ package com.a.b.moviesapp;
 import android.content.Context;
 import android.content.res.Resources;
 import android.graphics.Point;
-import android.support.v4.app.FragmentTransaction;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.Log;
@@ -13,6 +12,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 
 import com.a.b.moviesapp.other.Constants;
@@ -26,7 +26,7 @@ import java.util.List;
  * Created by Andrew on 1/7/2016.
  */
 public class GridViewAdapter extends RecyclerView.Adapter <GridViewAdapter.MyViewHolder>{
-    String TAG="GridViewAdapter ViewAdapter";
+    String TAG="GridViewAdapter";
     Integer mPicHeight=0;
     private static RecyclerClickListener mListener;
     List<Movie>mMovies= Collections.emptyList();
@@ -54,7 +54,7 @@ public class GridViewAdapter extends RecyclerView.Adapter <GridViewAdapter.MyVie
             height=3 * ((point.x / 2) -(marginInt * 2))/2;
         }
 
-        Log.e(TAG, "display metrics, x:" + point.x + ", y: " + point.y+", PicHeight: "+height+", marginInt: "+marginInt);
+//        Log.e(TAG, "display metrics, x:" + point.x + ", y: " + point.y+", PicHeight: "+height+", marginInt: "+marginInt);
         return height;
     }
 
@@ -80,19 +80,20 @@ public class GridViewAdapter extends RecyclerView.Adapter <GridViewAdapter.MyVie
             Movie current = mMovies.get(position);
             String fullUrl = Constants.TMDB_IMAGE_BASE_URL_LARGE + current.getPosterUrl();
 
+            Log.e(TAG, "poster url: "+mMovies.get(position).getMovieTitle()+", "+fullUrl);
 
-//        Log.e(TAG,"onBindViewHolder: ")
+            holder.mTitleView.setText(mMovies.get(position).getMovieTitle());
+
             Glide.with(mContext)
                     .load(fullUrl)
-                    .placeholder(R.drawable.placeholder_vertical)
-                    .crossFade(500)
-//             .error(R.drawable.user_placeholder_error)
+                    .placeholder(R.drawable.blank_image)
+//                    .placeholder(R.drawable.placeholder_vertical)
+                    .crossFade(400)
+//                    .error(R.drawable.blank_image)
                     .into(holder.mImageView);
+
         }else{
-            Log.e(TAG,"onBindViewHolder NULL");
-            Glide.with(mContext)
-                    .load(R.drawable.placeholder_vertical)
-                    .into(holder.mImageView);
+//            Log.e(TAG,"onBindViewHolder NULL");
         }
     }
 
@@ -107,9 +108,11 @@ public class GridViewAdapter extends RecyclerView.Adapter <GridViewAdapter.MyVie
 
     class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         ImageView mImageView;
+        TextView mTitleView;
 
         public MyViewHolder(View itemView) {
             super(itemView);
+            mTitleView=(TextView) itemView.findViewById(R.id.title_view);
             mImageView=(ImageView) itemView.findViewById(R.id.movie_picture);
             itemView.setOnClickListener(this);
         }

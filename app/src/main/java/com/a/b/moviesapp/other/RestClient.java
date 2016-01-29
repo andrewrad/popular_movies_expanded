@@ -21,7 +21,6 @@ import retrofit.Retrofit;
 public class RestClient {
 
     private static ApiInterface mApiInterface ;
-//    private static String baseUrl = "https://api.github.com" ;
 
     public static ApiInterface getClient() {
         String TAG="RestClient";
@@ -37,28 +36,17 @@ public class RestClient {
             okClient.interceptors().add(new Interceptor() {
                 @Override
                 public Response intercept(Chain chain) throws IOException {
-                    Response response = chain.proceed(chain.request());
-                    return null;
+                Response response = chain.proceed(chain.request());
+                return null;
                 }
             });
-//            HttpLoggingInterceptor interceptor = new HttpLoggingInterceptor();
-//
-//            interceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
-//            mHttpClient.interceptors().add(interceptor);
-
-
-//            Gson gson = new GsonBuilder()
-//                    .setDateFormat("yyyy-MM-dd'T'HH:mm:ssZ")
-//                    .create();
 
             Retrofit client = new Retrofit.Builder()
-                    .baseUrl(Constants.TRAILER_BASE_URL)
-//                    .baseUrl(baseUrl)
-                    .addConverter(String.class, new ToStringConverter())
-                    .client(httpClient)
-//                    .addConverterFactory(GsonConverterFactory.create(gson))
-                    .addConverterFactory(GsonConverterFactory.create())
-                    .build();
+                .baseUrl(Constants.TRAILER_BASE_URL)
+                .addConverter(String.class, new ToStringConverter())
+                .client(httpClient)
+                .addConverterFactory(GsonConverterFactory.create())
+                .build();
             mApiInterface = client.create(ApiInterface.class);
             Log.e(TAG,"RestClient testing log statement: "+client);
         }

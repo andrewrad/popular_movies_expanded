@@ -26,6 +26,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ListAdapter;
 import android.widget.ListView;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.widget.ToggleButton;
@@ -43,6 +44,7 @@ import com.bumptech.glide.Glide;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
+import java.lang.annotation.Target;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
@@ -64,6 +66,7 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
     TextView mReviews;
     TextView mTrailersHeader;
     ListView mTrailerListView;
+    ScrollView mScrollView;
 
     Call<ResultPOJO> mCall;
 
@@ -93,6 +96,7 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
         mTrailerListView=(ListView) view.findViewById(R.id.trailer_listview);
         mFavorite=(ToggleButton) view.findViewById(R.id.toggleButton);
         mFavorite.setOnClickListener(this);
+        mScrollView=(ScrollView) view.findViewById(R.id.detail_scrollview);
 
         populateViews();
         setFavorites();
@@ -109,35 +113,38 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
         mMovieDetails=(Movie) args.getParcelable(Constants.DETAILS_BUNDLE);
 
         if(mMovieDetails!=null) {
-            String fullUrl=Constants.TMDB_IMAGE_BASE_URL_LARGE+mMovieDetails.getBackDropUrl();
-            Log.e(TAG, "Backdrop path: " + fullUrl);
-            if(getResources().getBoolean(R.bool.isTablet)) {
 
-                WindowManager wm = (WindowManager) getActivity().getSystemService(Context.WINDOW_SERVICE);
-                DisplayMetrics metrics = Resources.getSystem().getDisplayMetrics();
-                Display display = wm.getDefaultDisplay();
-                Point point=new Point();
-                display.getSize(point);
+//            Log.e(TAG, "mMovieDetails.getBackDropUrl(): "+mMovieDetails.getBackDropUrl());
 
-                Integer height=Math.round(281*(point.x/2)/500);
-                Log.e(TAG, "display metrics, x:" + point.x + ", y: " + point.y+", calculated new height: "+height);
-                mBackGroundImage.getLayoutParams().height=height;
+            if(mMovieDetails.getBackDropUrl()!="null") {
+                String fullUrlBackdrop = Constants.TMDB_IMAGE_BASE_URL_LARGE + mMovieDetails.getBackDropUrl();
+//                Log.e(TAG, "Backdrop path: " + fullUrlBackdrop);
 
                 Glide.with(getActivity())
-                        .load(fullUrl)
+                        .load(fullUrlBackdrop)
                         .into(mBackGroundImage);
-            }else{
-                Glide.with(getActivity())
-                        .load(fullUrl)
-                        .into(mBackGroundImage);
+
+//                Log.e(TAG, "background Image: " + mBackGroundImage.getDrawable());
+
+                if (getResources().getBoolean(R.bool.isTablet)) {
+                    WindowManager wm = (WindowManager) getActivity().getSystemService(Context.WINDOW_SERVICE);
+                    DisplayMetrics metrics = Resources.getSystem().getDisplayMetrics();
+                    Display display = wm.getDefaultDisplay();
+                    Point point = new Point();
+                    display.getSize(point);
+
+                    Integer height = Math.round(281 * (point.x / 2) / 500);
+                    Log.e(TAG, "display metrics, x:" + point.x + ", y: " + point.y + ", calculated new height: " + height);
+                    mBackGroundImage.getLayoutParams().height = height;
+                }
             }
 
+//            Log.e(TAG, "background image height: " + mBackGroundImage.getMeasuredHeight());
 
-            Log.e(TAG, "background image height: " + mBackGroundImage.getMeasuredHeight());
-
-            fullUrl=Constants.TMDB_IMAGE_BASE_URL_SMALL+mMovieDetails.getPosterUrl();
+            String fullUrlPoster=Constants.TMDB_IMAGE_BASE_URL_SMALL+mMovieDetails.getPosterUrl();
+            Log.e(TAG,"full url poster: "+fullUrlPoster);
             Glide.with(getActivity())
-                .load(fullUrl)
+                .load(fullUrlPoster)
                 .into(mPosterPic);
 
             mTitle.setText(mMovieDetails.getMovieTitle());
@@ -179,6 +186,7 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
 
 //                    final List<Youtube> trail = mMovieExtras.getTrailers().getYoutube();
                     setTrailersView(mMovieExtras.getTrailers().getYoutube());
+                    mMovieDetails.setTrailer(mMovieExtras.getTrailers().getYoutube());
 //                    mTrailersHeader.setText(trail.size() > 1 ? "Movie Trailers" : "Movie Trailer");
 
 //                    List<String> trailers = new ArrayList<String>();
@@ -210,6 +218,7 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
 //                    mReviews.setText(reviews);
 
                     setReviewsView(mMovieExtras.getReviews().getResults());
+                    mMovieDetails.setReviews(mMovieExtras.getReviews().getResults());
 
                 } else {
                     Log.e(TAG, "request not successful??");
@@ -226,40 +235,30 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
         });
     }
     public void setTrailersView(final List<Youtube> trail){
-        mTrailersHeader.setText(trail.size() > 1 ? "Movie Trailers" : "Movie Trailer");
+        if(trail!=null&&trail.size()>0) {
+            mTrailersHeader.setText(trail.size() > 1 ? "Movie Trailers" : "Movie Trailer");
 
-        List<String> trailers = new ArrayList<String>();
-        for (int i = 0; i < trail.size(); i++) {
-            trailers.add(trail.get(i).getName());
-        }
+            List<String> trailers = new ArrayList<String>();
+            for (int i = 0; i < trail.size(); i++) {
+                trailers.add(trail.get(i).getName());
+                Log.e(TAG, "trailers before setting view: "+trail.get(i).getName());
+            }
 
-        mTrailerListView.setItemsCanFocus(false);
-        setListViewHeight(mTrailerListView);
+            mTrailerListView.setItemsCanFocus(false);
 
-        ArrayAdapter sa = new ArrayAdapter(getActivity(), R.layout.trailer_button, trailers);
-        mTrailerListView.setAdapter(sa);
-        mTrailerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+            ArrayAdapter sa = new ArrayAdapter(getActivity(), R.layout.trailer_button, trailers);
+            mTrailerListView.setAdapter(sa);
+            setListViewHeight(mTrailerListView);
+            mTrailerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
 //                            Log.e(TAG, "clicked " + trail.get(position).getName() + ", https://www.youtube.com/watch?v=" + trail.get(position).getSource());
-                startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.youtube.com/watch?v=" + trail.get(position).getSource())));
-            }
-        });
+                    startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse("http://www.youtube.com/watch?v=" + trail.get(position).getSource())));
+                }
+            });
+        }
     }
-
-    public void setReviewsView(List<ReviewResult> review){
-        Log.e(TAG,"setReviewsView: "+review);
-//        if(review!=null) {
-            String reviews = "";
-            for (ReviewResult r : review) {
-                reviews += "Movie Review from " + r.getAuthor() + ": \n\n" +
-                        r.getContent() + "\n\n\n";
-            }
-            mReviews.setText(reviews);
-//        }
-    }
-
-    public static void setListViewHeight(ListView listView) {
+    public void setListViewHeight(ListView listView) {
         ListAdapter listAdapter = listView.getAdapter();
         if (listAdapter == null) {
             return;
@@ -277,31 +276,39 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
         listView.requestLayout();
     }
 
-    /*
-    onPause: to determine if the favorite star  was selected or not
-    if favorited, check to see if is was previously favorited.
-    if not previously favorited, add the movie to the DB
-    if the movie is not favorited, attempt to remove it from the DB, if it returns 1, remove from DB and update the gridView
-     */
+    public void setReviewsView(List<ReviewResult> review){
+        Log.e(TAG, "setReviewsView: " + review);
+        if(review!=null) {
+            String reviews = "";
+            for (ReviewResult r : review) {
+                reviews += "Movie Review from " + r.getAuthor() + ": \n\n" +
+                        r.getContent() + "\n\n\n";
+            }
+            mReviews.setText(reviews);
+        }
+//        mScrollView.fullScroll(ScrollView.FOCUS_UP);
+        mScrollView.smoothScrollTo(0,0);
+    }
 
     @Override
     public void onPause() {
         super.onPause();
         mCall.cancel();
-
         Log.e(TAG, "onPause, toggleview is set to: " + mFavorite.isChecked());
 
-        if(mFavorite.isChecked()) {
-            if(mMovieDetails.mFavorited!=Boolean.TRUE) {
-                saveFavoritedMovie();
-            }
-        }else{
+        if(!getResources().getBoolean(R.bool.isTablet)){
+            if (mFavorite.isChecked()) {
+                if (mMovieDetails.mFavorited != Boolean.TRUE) {
+                    saveFavoritedMovie();
+                }
+            } else {
 //            String[]deleteId=new String[]{mMovieDetails.getMovieTitle()};
-            int deleted=getContext().getContentResolver().delete(Uri.parse(Constants.CONTENT_AUTHORITY + "/delete"),String.valueOf(mMovieDetails.getId()),null);
-            Log.e(TAG, "Deleted "+deleted+" movie");
-            if(deleted>0) {
-                mListener.deleteMovie();
-//                EventBus.getDefault().postSticky(new RefreshGridView());
+                Log.e(TAG,"Deleting a movie: "+String.valueOf(mMovieDetails.getId()));
+                int deleted = getContext().getContentResolver().delete(Uri.parse(Constants.CONTENT_AUTHORITY + "/delete"), String.valueOf(mMovieDetails.getId()), null);
+                Log.e(TAG, "Deleted " + deleted + " movie");
+                if (deleted > 0) {
+                    mListener.deleteMovie();
+                }
             }
         }
     }
@@ -370,13 +377,15 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
 
     @Override
     public void onClick(View v) {
-        if(!mFavorite.isChecked()&&getResources().getBoolean(R.bool.isTablet)) {
-            int deleted=getContext().getContentResolver().delete(Uri.parse(Constants.CONTENT_AUTHORITY + "/delete"),String.valueOf(mMovieDetails.getId()),null);
-            if(deleted>0) {
-                mListener.deleteMovie();
+        if(v.getId()==R.id.toggleButton&&getResources().getBoolean(R.bool.isTablet)) {
+            if (!mFavorite.isChecked()){
+                int deleted = getContext().getContentResolver().delete(Uri.parse(Constants.CONTENT_AUTHORITY + "/delete"), String.valueOf(mMovieDetails.getId()), null);
+                if (deleted > 0) {
+                    mListener.deleteMovie();
+                }
+            } else {
+                saveFavoritedMovie();
             }
-        }else{
-            saveFavoritedMovie();
         }
     }
 }
