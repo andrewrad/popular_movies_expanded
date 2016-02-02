@@ -1,0 +1,14 @@
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".activities.MainActivity">
+
+    <item android:id="@+id/menu_item_popular_sort"
+        android:title="@string/action_popular_sort"/>
+
+    <item android:id="@+id/menu_item_highest_rated"
+        android:title="@string/action_highest_rated"/>
+
+    <item android:id="@+id/menu_item_favorited"
+        android:title="@string/action_favorited"/>
+
+</menu>
