@@ -84,10 +84,10 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter <RecyclerViewAdapt
     }
 
     /**
-     * Required for RecyclerViewAdapter
-     * @param parent
-     * @param viewType
-     * @return
+     * Required for RecyclerViewAdapter, creates the view holder for each movie poster image.
+     * @param parent provided by RecyclerView adapter
+     * @param viewType provided by RecyclerView adapter
+     * @return custom created MyViewHolder
      */
     @Override
     public MyViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -103,8 +103,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter <RecyclerViewAdapt
     /**
      * Sets the title and move poster image. The title is behind the image on a FrameLayout. We set the
      * title first then set the image. If the image fails to load, the user will still see the title.
-     * @param holder
-     * @param position
+     * @param holder provided by RecyclerView adapter
+     * @param position provided by RecyclerView adapter
      */
     @Override
     public void onBindViewHolder(MyViewHolder holder, int position) {
@@ -137,6 +137,10 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter <RecyclerViewAdapt
         }
     }
 
+    /**
+     * Custom ViewHolder which links the xml view to a java view, in this case ImageView and TextView.
+     * Sets a clickListener to the ViewHolder.
+     */
     class MyViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener{
         ImageView mImageView;   //holds the movie poster image
         TextView mTitleView;    //holds the movie title
@@ -148,6 +152,8 @@ public class RecyclerViewAdapter extends RecyclerView.Adapter <RecyclerViewAdapt
             itemView.setOnClickListener(this);
         }
 
+        /* Interface call back to MovieListFragment. This subsequently calls an interface within MainActivity
+        to open DetailFragment with the details of the selected movie at the selected position. */
         @Override
         public void onClick(View v) {
             mListener.recyclerClicked(v,this.getLayoutPosition());

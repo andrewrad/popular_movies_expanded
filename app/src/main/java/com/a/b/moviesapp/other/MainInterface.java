@@ -10,6 +10,6 @@ public class MainInterface {
     public interface MovieInterface{
         void openDetailFragment(Movie movie);
         void holdOldTitle();
-        void deleteMovie();
+        void updateFavorites();
     }
 }

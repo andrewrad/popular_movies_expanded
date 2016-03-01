@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--Layout created specifically for tablets. The wider layout allows for a master/detail view. This is
+accomplished by setting two identical layouts side-by-side and setting width to 0 and weight to 1-->
+
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
@@ -17,18 +20,4 @@
         android:layout_height="match_parent"
         android:id="@+id/fragment_container2">
     </FrameLayout>
-
-
 </LinearLayout>
-
-    <!--<?xml version="1.0" encoding="utf-8"?>-->
-<!--<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
-<!--xmlns:app="http://schemas.android.com/apk/res-auto"-->
-<!--xmlns:tools="http://schemas.android.com/tools"-->
-<!--android:layout_width="match_parent"-->
-<!--android:layout_height="match_parent"-->
-<!--app:layout_behavior="@string/appbar_scrolling_view_behavior"-->
-<!--tools:context=".activities.DetailActivity"-->
-<!--android:id="@+id/fragment_container">-->
-
-<!--</RelativeLayout>-->

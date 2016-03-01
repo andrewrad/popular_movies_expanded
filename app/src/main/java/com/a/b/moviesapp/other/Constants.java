@@ -3,8 +3,8 @@ package com.a.b.moviesapp.other;
 import android.net.Uri;
 
 /**
- * Created by Andrew on 1/12/2016.
  * This class holds all constant variables for this project.
+ * Created by Andrew on 1/12/2016.
  */
 public class Constants {
     public static final String API_KEY_STRING="22e815e44d11366f2446d1fa6aa31e75";

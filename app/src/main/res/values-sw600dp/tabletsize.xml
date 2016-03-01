@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--Simple way of determining whether the user's device is a phone or tablet-->
 <resources>
     <bool name="isTablet">true</bool>
 </resources>

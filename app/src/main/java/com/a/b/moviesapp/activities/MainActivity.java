@@ -19,6 +19,11 @@ import com.a.b.moviesapp.fragments.MovieDetailsFragment;
 /**
  * Starting place for the app. This is the base Activity, so fragment-to-fragment communication goes through this
  * class. All views are displayed and manipulated through their particular fragment.
+ * The app retrieves movie data from the themoviedb.com through two network calls. The first one is for a general
+ * overview of all movies in either popular movies or highest rated. Once the user selects a movie, reviews and
+ * movie trailers are pulled from a second network call.
+ * The first network call is an AsyncTask, the second uses Retrofit. Ideally both should be the same and using
+ * Retrofit but this app shows I can do both if needed.
  * Created by Andrew on 1/1/2016.
  */
 
@@ -59,7 +64,8 @@ public class MainActivity extends AppCompatActivity implements MainInterface.Mov
     }
 
     /**
-     * Opens the detail view either in a new window (phone) or as one half of the screen (tablet)
+     * Opens the detail view either in a new window (phone) or as one half of the screen (tablet) in a master-
+     * detail view type.
      * @param movie Movie
      */
     @Override
@@ -82,15 +88,21 @@ public class MainActivity extends AppCompatActivity implements MainInterface.Mov
     }
 
     /**
-     * Retrieves the title from the toolbar to give the user an accurate title for what they are viewing
+     * Retrieves the title from the toolbar to give the user an accurate title for what they are viewing.
      */
     @Override
     public void holdOldTitle() {
         mToolBarTitle=getSupportActionBar().getTitle();
     }
 
+    /**
+     * Interface function; Movie was deleted from the favorites database. If the toolbar is showing the
+     * favorites screen, then update the favorites screen by querying the database through MovieListFragment.
+     * Otherwise the favorites screen will be automatically updated next time the user visits their list
+     * of favorite movies.
+     */
     @Override
-    public void deleteMovie() {
+    public void updateFavorites() {
         if(mToolBarTitle.equals(getString(R.string.action_favorited))){
             mMainFragment.getFavorites();
         }

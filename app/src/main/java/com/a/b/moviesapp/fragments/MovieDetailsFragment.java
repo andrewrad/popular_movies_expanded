@@ -295,7 +295,7 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
                 int deleted = getContext().getContentResolver().delete(Uri.parse(Constants.CONTENT_AUTHORITY + "/delete"), String.valueOf(mMovieDetails.getId()), null);
                 Log.e(TAG, "Deleted " + deleted + " movie");
                 if (deleted > 0) {
-                    mListener.deleteMovie();
+                    mListener.updateFavorites();
                 }
             }
         }
@@ -392,8 +392,10 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
         if(v.getId()==R.id.toggleButton&&getResources().getBoolean(R.bool.isTablet)) {
             if (!mFavorite.isChecked()){
                 int deleted = getContext().getContentResolver().delete(Uri.parse(Constants.CONTENT_AUTHORITY + "/delete"), String.valueOf(mMovieDetails.getId()), null);
+
+                /*if the delete function (above) returns anything above a 0, it shows that a row was deleted*/
                 if (deleted > 0) {
-                    mListener.deleteMovie();
+                    mListener.updateFavorites();
                 }
             } else {
                 saveFavoritedMovie();
