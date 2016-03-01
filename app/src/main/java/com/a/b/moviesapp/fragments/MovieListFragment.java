@@ -58,8 +58,6 @@ public class MovieListFragment extends Fragment implements RecyclerClickListener
     private GridLayoutManager mLayout;
     private ArrayList<Movie> mMovieArray;
 
-
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.grid_fragment, container, false);
@@ -120,6 +118,14 @@ public class MovieListFragment extends Fragment implements RecyclerClickListener
         mListener.holdOldTitle();
         return super.onOptionsItemSelected(item);
     }
+
+    /**
+     * Pulls the stored movies (favorites) from the ContentProvider, which pulls data from the SQLite database.
+     * Each cursor row is parsed and placed into a Movie object. Movie trailers and reviews are stored in the
+     * database as a JSON array. Here it retrieves the JSON array and parses the data into an arrayList of YouTube
+     * and ReviewResult objects (there may be more than one trailer and/or review) and places this arrayList
+     * into the Movies object.
+     */
     public void getFavorites(){
         Log.e(TAG, "getFavorites");
         String[] selection=new String[]{Constants.TITLE};
@@ -164,7 +170,6 @@ public class MovieListFragment extends Fragment implements RecyclerClickListener
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
 
                 List<ReviewResult> reviewResults=new ArrayList<>();
                 try {
@@ -234,6 +239,11 @@ public class MovieListFragment extends Fragment implements RecyclerClickListener
         mListener.openDetailFragment(mMovieArray.get(position));
     }
 
+    /**
+     * This AsyncTask does the heavy lifting of pulling basic movie details from themoviedb api. The api is
+     * set up to pull all data seen in the details page except the reviews and trailers. Those are handled with
+     * Retrofit in another part of this app under a separate api call.
+     */
     public class FetchMoviesTask extends AsyncTask<String, Void, ArrayList<Movie>> {
         private final String LOG_TAG = MovieListFragment.class.getSimpleName();
 
@@ -243,7 +253,6 @@ public class MovieListFragment extends Fragment implements RecyclerClickListener
             BufferedReader reader = null;
             String jsonString = null;
             try {
-
                 Uri builtUri = Uri.parse(Constants.BASE_URL).buildUpon()
                     .appendPath(params[0])
                     .appendQueryParameter(Constants.API_KEY, Constants.API_KEY_STRING)
@@ -304,6 +313,12 @@ public class MovieListFragment extends Fragment implements RecyclerClickListener
             }
             return null;
         }
+
+        /**
+         * Function created to provide complete logging. The JSON responses tend to overfill logcat
+         * @param TAG tag for logging
+         * @param message message for specific logging
+         */
         public void logMore(String TAG, String message) {
             int maxLogSize = 2000;
             for(int i = 0; i <= message.length() / maxLogSize; i++) {
@@ -369,6 +384,11 @@ public class MovieListFragment extends Fragment implements RecyclerClickListener
 //        EventBus.getDefault().unregister(this);
 //        super.onStop();
 //    }
+
+    /**
+     * For attaching to the activity so this class can use the implemented MovieInterface on the MainActivity
+     * @param activity provided by Android
+     */
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);

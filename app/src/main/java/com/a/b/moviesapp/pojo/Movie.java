@@ -6,8 +6,8 @@ import android.os.Parcelable;
 import java.util.List;
 
 /**
- * Created by Andrew on 1/1/2015.
  * Java class object for storing all movie data
+ * Created by Andrew on 1/1/2015.
  */
 public class Movie implements Parcelable {
     public Integer mId;

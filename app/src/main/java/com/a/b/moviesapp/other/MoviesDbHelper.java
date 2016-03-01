@@ -37,8 +37,16 @@ public class MoviesDbHelper extends SQLiteOpenHelper {
          db.execSQL(CREATE_MOVIES_TABLE);
     }
 
+    /**
+     * Currently set to drop the old database on an upgrade. Will need to be rewritten if the app goes live;
+     * no one wants all their saved data to be lost if the app upgrades.
+     * @param db passed by Android
+     * @param oldVersion passed by Android
+     * @param newVersion passed by Android
+     */
     @Override
     public void onUpgrade(SQLiteDatabase db, int oldVersion, int newVersion) {
+        //TODO Change onUpgrade to save old database and migrate to new database
         db.execSQL("DROP TABLE IF EXISTS " + Constants.TABLE_NAME);
         onCreate(db);
     }

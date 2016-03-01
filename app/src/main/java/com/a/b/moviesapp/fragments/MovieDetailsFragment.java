@@ -106,6 +106,10 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
         setHasOptionsMenu(true);
     }
 
+    /**
+     * Sets the views for the DetailFragment. Mostly used to pull data from the Movie object and fill corresponding
+     * views with data. Glide is used to fill image data from a url.
+     */
     public void populateViews(){
         Bundle args=getArguments();
         mMovieDetails=(Movie) args.getParcelable(Constants.DETAILS_BUNDLE);
@@ -167,6 +171,12 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
             mFavorite.setChecked(checked);
         }
     }
+
+    /**
+     * Gets the trailers and reviews from a different api call. This uses Retrofit to pull and parse the
+     * acquired JSON string.
+     * @param id the unique movieId for the selected movie
+     */
     public void getTrailersAndReviews(Integer id){
 
         ApiInterface service=RestClient.getClient();
@@ -200,14 +210,21 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
             }
         });
     }
+
+    /**
+     * Sets up the adapter for displaying the list of clickable trailers. Prepends the youtube http url to an
+     * intent if the user clicks on the trailer so it can open in a YouTube app on the device.
+     * @param trail list of trailers
+     */
     public void setTrailersView(final List<Youtube> trail){
         if(trail!=null&&trail.size()>0) {
+            /* Creates title over the listView of trailers. If only one, makes it singular*/
             mTrailersHeader.setText(trail.size() > 1 ? "Movie Trailers:" : "Movie Trailer:");
 
             List<String> trailers = new ArrayList<String>();
             for (int i = 0; i < trail.size(); i++) {
                 trailers.add(trail.get(i).getName());
-                Log.e(TAG, "trailers before setting view: "+trail.get(i).getName());
+//                Log.e(TAG, "trailers before setting view: "+trail.get(i).getName());
             }
 
             mTrailerListView.setItemsCanFocus(false);
@@ -223,6 +240,12 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
             });
         }
     }
+
+    /**
+     * Need to set the listView of movie trailers to a specific height or else the listView doesn't look right
+     * and causes the fragment to jump to the movie trailers section.
+     * @param listView listView of movie trailers
+     */
     public void setListViewHeight(ListView listView) {
         ListAdapter listAdapter = listView.getAdapter();
         if (listAdapter == null) {
@@ -252,7 +275,7 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
             mReviews.setText(reviews);
         }
 //        mScrollView.fullScroll(ScrollView.FOCUS_UP);
-        mScrollView.smoothScrollTo(0,0);
+        mScrollView.smoothScrollTo(0, 0);
     }
 
     @Override
@@ -310,8 +333,8 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
 
     /**
      * Creates a new set of optionMenu for this fragment
-     * @param menu
-     * @param inflater
+     * @param menu provided by Android
+     * @param inflater provided by Android
      */
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
@@ -319,6 +342,12 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
         inflater.inflate(R.menu.movie_details_menu, menu);
     }
 
+    /**
+     * Allows the user to share the first movie trailer via an intent. Opens any built in app that can process this
+     * request, such as email or SMS service
+     * @param item
+     * @return
+     */
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
@@ -336,6 +365,11 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
         }
         return super.onOptionsItemSelected(item);
     }
+
+    /**
+     * For attaching to the activity so this class can use the implemented MovieInterface on the MainActivity
+     * @param activity provided by Android
+     */
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
@@ -347,6 +381,12 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
         }
     }
 
+    /**
+     * Allows the user to save a movie to the database via the ContentProvider by toggling the star on the details
+     * page. If the star is toggled on, the movie is added to the database. If the star is toggled off, the movie
+     * is removed from the database.
+     * @param v passed by Android
+     */
     @Override
     public void onClick(View v) {
         if(v.getId()==R.id.toggleButton&&getResources().getBoolean(R.bool.isTablet)) {
