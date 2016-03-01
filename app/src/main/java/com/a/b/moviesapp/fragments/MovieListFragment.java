@@ -19,14 +19,13 @@ import android.view.ViewGroup;
 import android.widget.Toast;
 
 import com.a.b.moviesapp.other.Constants;
-import com.a.b.moviesapp.GridViewAdapter;
+import com.a.b.moviesapp.RecyclerViewAdapter;
 import com.a.b.moviesapp.other.MainInterface;
-import com.a.b.moviesapp.other.RefreshGridView;
+//import com.a.b.moviesapp.other.RefreshGridView;
 import com.a.b.moviesapp.pojo.Movie;
 import com.a.b.moviesapp.R;
 import com.a.b.moviesapp.RecyclerClickListener;
 import com.a.b.moviesapp.pojo.ReviewResult;
-import com.a.b.moviesapp.pojo.Reviews;
 import com.a.b.moviesapp.pojo.Youtube;
 
 import org.json.JSONArray;
@@ -44,18 +43,28 @@ import java.util.List;
 
 import de.greenrobot.event.EventBus;
 
+/**
+ * Main view for the list of clickable movie posters. Uses a RecyclerView to display all movie posters.
+ * The RecyclerView helps dramatically display either 2 or 3 columns of images and switching between the
+ * two very rapidly if needed.
+ * Created by Andrew on 1/1/2016.
+ */
+
 public class MovieListFragment extends Fragment implements RecyclerClickListener{
     String TAG="MovieListFragment";
     MainInterface.MovieInterface mListener;
     RecyclerView mRecyclerView;
-    private GridViewAdapter mGridViewAdapter;
+    private RecyclerViewAdapter mGridViewAdapter;
     private GridLayoutManager mLayout;
     private ArrayList<Movie> mMovieArray;
+
+
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,Bundle savedInstanceState) {
         View view = inflater.inflate(R.layout.grid_fragment, container, false);
 
+        /* Detects whether the device is a tablet or phone, tablet has 3 columns, phone has 2*/
         if(getResources().getBoolean(R.bool.isTablet)) {
             mLayout = new GridLayoutManager(getActivity(), 3);
         }else{
@@ -65,7 +74,7 @@ public class MovieListFragment extends Fragment implements RecyclerClickListener
         mRecyclerView = (RecyclerView) view.findViewById(R.id.recycler_view);
         mRecyclerView.setHasFixedSize(true);
         mRecyclerView.setLayoutManager(mLayout);
-        mGridViewAdapter = new GridViewAdapter(getActivity(), this);
+        mGridViewAdapter = new RecyclerViewAdapter(getActivity(), this);
         mRecyclerView.setAdapter(mGridViewAdapter);
         mGridViewAdapter.setList(mMovieArray);
 
@@ -346,20 +355,20 @@ public class MovieListFragment extends Fragment implements RecyclerClickListener
             }
         }
     }
-    public void onEvent(RefreshGridView event){
-        getFavorites();
-    }
-    @Override
-    public void onStart() {
-        super.onStart();
-        EventBus.getDefault().registerSticky(this);
-    }
-
-    @Override
-    public void onStop() {
-        EventBus.getDefault().unregister(this);
-        super.onStop();
-    }
+//    public void onEvent(RefreshGridView event){
+//        getFavorites();
+//    }
+//    @Override
+//    public void onStart() {
+//        super.onStart();
+//        EventBus.getDefault().registerSticky(this);
+//    }
+//
+//    @Override
+//    public void onStop() {
+//        EventBus.getDefault().unregister(this);
+//        super.onStop();
+//    }
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);

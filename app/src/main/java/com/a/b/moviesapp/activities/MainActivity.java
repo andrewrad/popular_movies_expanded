@@ -16,6 +16,12 @@ import com.a.b.moviesapp.R;
 import com.a.b.moviesapp.fragments.MovieListFragment;
 import com.a.b.moviesapp.fragments.MovieDetailsFragment;
 
+/**
+ * Starting place for the app. This is the base Activity, so fragment-to-fragment communication goes through this
+ * class. All views are displayed and manipulated through their particular fragment.
+ * Created by Andrew on 1/1/2016.
+ */
+
 public class MainActivity extends AppCompatActivity implements MainInterface.MovieInterface{
     String TAG="MainActivity";
     Boolean backPressedToExitOnce=false;
@@ -39,15 +45,23 @@ public class MainActivity extends AppCompatActivity implements MainInterface.Mov
             ft.replace(R.id.fragment_container, mMainFragment).commit();
         }else{
             mMainFragment=(MovieListFragment) getSupportFragmentManager().getFragment(savedInstanceState,"mMainFragment");
-
         }
     }
+
+    /**
+     * This function saves the MovieListFragment when the device is rotated
+     * @param outState provided by Android
+     */
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
         getSupportFragmentManager().putFragment(outState, "mMainFragment", (MovieListFragment) mMainFragment);
     }
 
+    /**
+     * Opens the detail view either in a new window (phone) or as one half of the screen (tablet)
+     * @param movie Movie
+     */
     @Override
     public void openDetailFragment(Movie movie) {
         MovieDetailsFragment movieDetailsFragment=new MovieDetailsFragment();
@@ -67,11 +81,13 @@ public class MainActivity extends AppCompatActivity implements MainInterface.Mov
         }
     }
 
+    /**
+     * Retrieves the title from the toolbar to give the user an accurate title for what they are viewing
+     */
     @Override
     public void holdOldTitle() {
         mToolBarTitle=getSupportActionBar().getTitle();
     }
-
 
     @Override
     public void deleteMovie() {
@@ -80,13 +96,16 @@ public class MainActivity extends AppCompatActivity implements MainInterface.Mov
         }
     }
 
+    /**
+     * Overrides onBackPressed by asking the user if they really want to exit the app. The app will be put in
+     * background if the back button is pressed twice in 2 seconds.
+     */
     @Override
     public void onBackPressed() {
         if (backPressedToExitOnce) {
             super.onBackPressed();
         }
         Integer endBackPressed=getResources().getBoolean(R.bool.isTablet)==Boolean.TRUE?1:0;
-//        Log.e(TAG,"backpressed istablet?: "+endBackPressed+", fragmentManager.getBackStackEntryCount(): "+fragmentManager.getBackStackEntryCount());
 
         if (fragmentManager.getBackStackEntryCount() > endBackPressed) {
             fragmentManager.popBackStack();

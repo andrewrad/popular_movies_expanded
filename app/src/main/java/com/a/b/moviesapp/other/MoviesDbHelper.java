@@ -5,6 +5,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 
 /**
+ * Basic database helper class that stores favorited movies. This class initially sets up the named columns
+ * for individual data items and provides an update method
  * Created by Andrew on 1/21/2016.
  */
 public class MoviesDbHelper extends SQLiteOpenHelper {

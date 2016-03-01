@@ -50,6 +50,8 @@ import retrofit.Callback;
 import retrofit.Response;
 
 /**
+ * The fragment for displaying all the movie details once the user clicks on a movie poster image in the
+ * MovieListFragment. Both phone and tablet (master-detail view) layout are considered in this fragment.
  * Created by Andrew on 1/2/2016.
  */
 public class MovieDetailsFragment extends Fragment implements View.OnClickListener{
@@ -129,6 +131,9 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
                     Point point = new Point();
                     display.getSize(point);
 
+                    /** On tablets, the image at the top of the movie details tends to have unpredictable characteristics,
+                     * to fix this, the height is calculated based on the device's width. Since tablets have a master-detail
+                     * view, the image height must be half of normal */
                     Integer height = Math.round(281 * (point.x / 2) / 500);
                     Log.e(TAG, "display metrics, x:" + point.x + ", y: " + point.y + ", calculated new height: " + height);
                     mBackGroundImage.getLayoutParams().height = height;
@@ -151,7 +156,7 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
             getTrailersAndReviews(mMovieDetails.getId());
         }
     }
-    public void  setFavorites(){
+    public void setFavorites(){
         String[]column=new String[]{Constants.FAVORITED};
         String[]selection=new String[]{mMovieDetails.getMovieTitle()};
         Cursor c= getContext().getContentResolver().query(Uri.parse(Constants.CONTENT_AUTHORITY + "/get_favorite"), column, Constants.TITLE + " = ? ", selection, null);
@@ -273,6 +278,11 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
         }
     }
 
+    /**
+     * Adds currently selected movie to the database
+     * All movies in the database are favorited (stared)
+     * Adding movie through content provider "/insert" command
+     */
     public void saveFavoritedMovie(){
         ContentValues cv = new ContentValues();
         if (mMovieDetails != null && mMovieExtras != null) {
@@ -298,6 +308,11 @@ public class MovieDetailsFragment extends Fragment implements View.OnClickListen
         }
     }
 
+    /**
+     * Creates a new set of optionMenu for this fragment
+     * @param menu
+     * @param inflater
+     */
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         super.onCreateOptionsMenu(menu, inflater);

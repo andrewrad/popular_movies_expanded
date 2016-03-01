@@ -16,6 +16,7 @@ import retrofit.GsonConverterFactory;
 import retrofit.Retrofit;
 
 /**
+ * This class sets up the OKHttp and Retrofit client for retrieving movie trailers and ratings
  * Created by Andrew on 1/14/2016.
  */
 public class RestClient {
@@ -23,8 +24,9 @@ public class RestClient {
     private static ApiInterface mApiInterface ;
 
     public static ApiInterface getClient() {
-        String TAG="RestClient";
+//        String TAG="RestClient";
 
+        /* Logging for http request, very handy and detailed logging output*/
         HttpLoggingInterceptor logging= new HttpLoggingInterceptor();
         logging.setLevel(HttpLoggingInterceptor.Level.BODY);
         OkHttpClient httpClient=new OkHttpClient();
@@ -48,7 +50,7 @@ public class RestClient {
                 .addConverterFactory(GsonConverterFactory.create())
                 .build();
             mApiInterface = client.create(ApiInterface.class);
-            Log.e(TAG,"RestClient testing log statement: "+client);
+//            Log.e(TAG,"RestClient testing log statement: "+client);
         }
 
         return mApiInterface ;

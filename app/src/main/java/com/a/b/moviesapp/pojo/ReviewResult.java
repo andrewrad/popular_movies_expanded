@@ -4,6 +4,7 @@ import android.os.Parcel;
 import android.os.Parcelable;
 
 /**
+ * Java object filled by Retrofit, part of retrieving movies and trailers
  * Created by Andrew on 1/20/2016.
  */
 public class ReviewResult implements Parcelable {

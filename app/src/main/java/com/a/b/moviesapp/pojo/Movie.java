@@ -7,6 +7,7 @@ import java.util.List;
 
 /**
  * Created by Andrew on 1/1/2015.
+ * Java class object for storing all movie data
  */
 public class Movie implements Parcelable {
     public Integer mId;
@@ -17,12 +18,11 @@ public class Movie implements Parcelable {
     public String mDate;
     public Double mVoteAverage;
     public Boolean mFavorited;
-
     public String mIso6391;
     public String mKey;
     public String mName;
     public String mSite;
-    public Integer mSize;
+//    public Integer mSize;
     public String mType;
 
     public List<Youtube> mTrailers;
@@ -48,13 +48,10 @@ public class Movie implements Parcelable {
         dest.writeString(mBackDropUrl);
         dest.writeString(mDate);
         dest.writeDouble(mVoteAverage);
-//        dest.writeByte((byte)(mFavorited?1:0));
-
         dest.writeString(mIso6391);
         dest.writeString(mKey);
         dest.writeString(mName);
         dest.writeString(mSite);
-//        dest.writeInt(size);
         dest.writeString(mType);
         dest.writeTypedList(mTrailers);
         dest.writeTypedList(mReviews);
@@ -68,13 +65,10 @@ public class Movie implements Parcelable {
         mBackDropUrl=source.readString();
         mDate=source.readString();
         mVoteAverage=source.readDouble();
-//        mFavorited=source.readByte()!=0;
-
         mIso6391=source.readString();
         mKey=source.readString();
         mName=source.readString();
         mSite=source.readString();
-//        size=source.readInt();
         mType=source.readString();
         source.readTypedList(mTrailers, (Creator<Youtube>) Youtube.class.getClassLoader());
         source.readTypedList(mReviews, (Creator<ReviewResult>) ReviewResult.class.getClassLoader());
@@ -133,7 +127,7 @@ public class Movie implements Parcelable {
     public void setRating(Double rating){
         mVoteAverage=rating;
     }
-    public Boolean getFavorite(){return mFavorited;}
+//    public Boolean getFavorite(){return mFavorited;}
     public void setFavorite(Boolean favorite){mFavorited=favorite;}
 
     public void setTrailer(List<Youtube> trailers){
@@ -151,46 +145,28 @@ public class Movie implements Parcelable {
     }
 
 
-
-
-    public String getIso6391() {
-        return mIso6391;
-    }
-
-    public void setIso6391(String mIso6391) {
-        this.mIso6391 = mIso6391;
-    }
-
-    public String getKey() {
-        return mKey;
-    }
-
-    public void setKey(String mKey) {
-        this.mKey = mKey;
-    }
-
-//    public String getName() {
-//        return name;
+//    public String getIso6391() {
+//        return mIso6391;
 //    }
-
-//    public void setName(String name) {
-//        this.name = name;
+//
+//    public void setIso6391(String mIso6391) {
+//        this.mIso6391 = mIso6391;
 //    }
-
-    public String getSite() {
-        return mSite;
-    }
-
-    public void setSite(String site) {
-        this.mSite = site;
-    }
-
-//    public Integer getSize() {
-//        return size;
+//
+//    public String getKey() {
+//        return mKey;
 //    }
-
-//    public void setSize(Integer size) {
-//        this.size = size;
+//
+//    public void setKey(String mKey) {
+//        this.mKey = mKey;
+//    }
+//
+//    public String getSite() {
+//        return mSite;
+//    }
+//
+//    public void setSite(String site) {
+//        this.mSite = site;
 //    }
 
     public String getType() {

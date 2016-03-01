@@ -9,6 +9,8 @@ import java.io.IOException;
 import retrofit.Converter;
 
 /**
+ * A ToStringConverter for Retrofit
+ * Used in RestClient as part of the Retrofit client builder
  * Created by Andrew on 1/15/2016.
  */
 public class ToStringConverter implements Converter<String> {
