@@ -17,4 +17,8 @@
     <string name="dead_network">Please check network connection</string>
 
     <string name="filler_text">Thirty years after defeating the Galactic Empire, Han Solo and his allies face a new threat from the evil Kylo Ren and his army of Stormtroopers</string>
+    <string name="movie_trailers_name">Movie Trailers:</string>
+    <string name="movie_trailer_name">Movie Trailer:</string>
+    <string name="youtube_base_url">http://www.youtube.com/watch?v=</string>
+    <string name="movie_review_from">"Movie Review from "</string>
 </resources>

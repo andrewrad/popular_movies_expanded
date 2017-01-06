@@ -22,14 +22,13 @@ import com.a.b.moviesapp.fragments.MovieDetailsFragment;
  * The app retrieves movie data from the themoviedb.com through two network calls. The first one is for a general
  * overview of all movies in either popular movies or highest rated. Once the user selects a movie, reviews and
  * movie trailers are pulled from a second network call.
- * The first network call is an AsyncTask, the second uses Retrofit. Ideally both should be the same and using
- * Retrofit but this app shows I can do both if needed.
+ *
  * Created by Andrew on 1/1/2016.
  */
 
 public class MainActivity extends AppCompatActivity implements MainInterface.MovieInterface{
-    String TAG="MainActivity";
-    Boolean backPressedToExitOnce=false;
+
+    Boolean backPressedToExitOnce = false;
     FragmentManager fragmentManager = getSupportFragmentManager();
     MovieListFragment mMainFragment;
     CharSequence mToolBarTitle;
@@ -39,17 +38,17 @@ public class MainActivity extends AppCompatActivity implements MainInterface.Mov
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        mToolBarTitle=getResources().getString(R.string.action_popular_sort);
-        mToolbar= (Toolbar) findViewById(R.id.toolbar_main);
+        mToolBarTitle = getResources().getString(R.string.action_popular_sort);
+        mToolbar = (Toolbar) findViewById(R.id.toolbar_main);
         mToolbar.setTitle(mToolBarTitle);
         setSupportActionBar(mToolbar);
 
-        if(savedInstanceState==null) {
-            mMainFragment=new MovieListFragment();
+        if (savedInstanceState == null) {
+            mMainFragment = new MovieListFragment();
             FragmentTransaction ft = fragmentManager.beginTransaction();
             ft.replace(R.id.fragment_container, mMainFragment).commit();
-        }else{
-            mMainFragment=(MovieListFragment) getSupportFragmentManager().getFragment(savedInstanceState,"mMainFragment");
+        } else {
+            mMainFragment = (MovieListFragment) getSupportFragmentManager().getFragment(savedInstanceState, "mMainFragment");
         }
     }
 
@@ -60,7 +59,7 @@ public class MainActivity extends AppCompatActivity implements MainInterface.Mov
     @Override
     protected void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        getSupportFragmentManager().putFragment(outState, "mMainFragment", (MovieListFragment) mMainFragment);
+        getSupportFragmentManager().putFragment(outState, "mMainFragment", mMainFragment);
     }
 
     /**
@@ -70,17 +69,18 @@ public class MainActivity extends AppCompatActivity implements MainInterface.Mov
      */
     @Override
     public void openDetailFragment(Movie movie) {
-        MovieDetailsFragment movieDetailsFragment=new MovieDetailsFragment();
+        MovieDetailsFragment movieDetailsFragment = new MovieDetailsFragment();
 
         Bundle bundle = new Bundle();
         bundle.putParcelable(Constants.DETAILS_BUNDLE, movie);
         movieDetailsFragment.setArguments(bundle);
 
-        FragmentTransaction ft=getSupportFragmentManager().beginTransaction();
-        if(getResources().getBoolean(R.bool.isTablet)){
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+
+        if (getResources().getBoolean(R.bool.isTablet)) {
             ft.replace(R.id.fragment_container2, movieDetailsFragment);
             ft.commit();
-        }else{
+        } else {
             ft.replace(R.id.fragment_container, movieDetailsFragment);
             ft.addToBackStack(null);
             ft.commit();
@@ -92,7 +92,7 @@ public class MainActivity extends AppCompatActivity implements MainInterface.Mov
      */
     @Override
     public void holdOldTitle() {
-        mToolBarTitle=getSupportActionBar().getTitle();
+        mToolBarTitle = getSupportActionBar().getTitle();
     }
 
     /**
@@ -103,7 +103,7 @@ public class MainActivity extends AppCompatActivity implements MainInterface.Mov
      */
     @Override
     public void updateFavorites() {
-        if(mToolBarTitle.equals(getString(R.string.action_favorited))){
+        if (mToolBarTitle.equals(getString(R.string.action_favorited))){
             mMainFragment.getFavorites();
         }
     }
@@ -117,7 +117,8 @@ public class MainActivity extends AppCompatActivity implements MainInterface.Mov
         if (backPressedToExitOnce) {
             super.onBackPressed();
         }
-        Integer endBackPressed=getResources().getBoolean(R.bool.isTablet)==Boolean.TRUE?1:0;
+
+        Integer endBackPressed = getResources().getBoolean(R.bool.isTablet) == Boolean.TRUE ? 1 : 0;
 
         if (fragmentManager.getBackStackEntryCount() > endBackPressed) {
             fragmentManager.popBackStack();
