@@ -1,6 +1,7 @@
 package com.a.b.moviesapp.fragments;
 
 import android.app.Activity;
+import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -45,13 +46,12 @@ import de.greenrobot.event.EventBus;
 
 /**
  * Main view for the list of clickable movie posters. Uses a RecyclerView to display all movie posters.
- * The RecyclerView helps dramatically display either 2 or 3 columns of images and switching between the
- * two very rapidly if needed.
+ *
  * Created by Andrew on 1/1/2016.
  */
 
-public class MovieListFragment extends Fragment implements RecyclerClickListener{
-    String TAG="MovieListFragment";
+public class MovieListFragment extends Fragment implements RecyclerClickListener {
+
     MainInterface.MovieInterface mListener;
     RecyclerView mRecyclerView;
     private RecyclerViewAdapter mGridViewAdapter;
@@ -83,11 +83,10 @@ public class MovieListFragment extends Fragment implements RecyclerClickListener
         super.onCreate(savedInstanceState);
         setHasOptionsMenu(true);
 
-        if(savedInstanceState==null){
+        if (savedInstanceState == null) {
             getMovies(Constants.MOST_POPULAR);
-        }else{
-            mMovieArray=savedInstanceState.getParcelableArrayList("movies");
-//            Log.e(TAG, "movies retrieved from savedInstanceState: " + savedInstanceState.getParcelableArrayList("movies"));
+        } else {
+            mMovieArray = savedInstanceState.getParcelableArrayList("movies");
         }
     }
     @Override
@@ -108,10 +107,12 @@ public class MovieListFragment extends Fragment implements RecyclerClickListener
         if (id == R.id.menu_item_popular_sort) {
             getMovies(Constants.MOST_POPULAR);
             ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(R.string.action_popular_sort);
-        }else if(id==R.id.menu_item_highest_rated) {
+
+        } else if (id==R.id.menu_item_highest_rated) {
             getMovies(Constants.HIGHEST_RATED);
             ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(R.string.action_highest_rated);
-        }else if(id==R.id.menu_item_favorited){
+
+        } else if (id==R.id.menu_item_favorited) {
             getFavorites();
             ((AppCompatActivity) getActivity()).getSupportActionBar().setTitle(R.string.action_favorited);
         }
@@ -126,11 +127,10 @@ public class MovieListFragment extends Fragment implements RecyclerClickListener
      * and ReviewResult objects (there may be more than one trailer and/or review) and places this arrayList
      * into the Movies object.
      */
-    public void getFavorites(){
-        Log.e(TAG, "getFavorites");
+    public void getFavorites() {
         String[] selection=new String[]{Constants.TITLE};
-        Cursor cursor = getContext().getContentResolver().query(Uri.parse(Constants.CONTENT_AUTHORITY+"/get_stored_movies"),null,null,null,null);
-        if(cursor!=null&& cursor.getCount()>0) {
+        Cursor cursor = getContext().getContentResolver().query(Uri.parse(Constants.CONTENT_AUTHORITY + getString(R.string.get_stored_movies)), null, null, null, null);
+        if (cursor != null && cursor.getCount() > 0) {
             cursor.moveToFirst();
             ArrayList<Movie> movies = new ArrayList<>();
             do {
@@ -145,12 +145,11 @@ public class MovieListFragment extends Fragment implements RecyclerClickListener
                 m.setSummary(cursor.getString(cursor.getColumnIndex(Constants.OVERVIEW)));
                 m.setFavorite(cursor.getInt(cursor.getColumnIndex(Constants.FAVORITED)) == 1 ? Boolean.TRUE : Boolean.FALSE);
 
-                String trailers=cursor.getString(cursor.getColumnIndex(Constants.TRAILERS));
-                String reviews=cursor.getString(cursor.getColumnIndex(Constants.REVIEWS));
+                String trailers = cursor.getString(cursor.getColumnIndex(Constants.TRAILERS));
+                String reviews = cursor.getString(cursor.getColumnIndex(Constants.REVIEWS));
 
-//                Log.e(TAG,"getFavorites trailers from DB: "+trailers+", reviews: "+reviews);
+                List<Youtube> movieTrailers = new ArrayList<>();
 
-                List<Youtube> movieTrailers=new ArrayList<>();
                 try {
                     JSONArray jsonArray = new JSONArray(trailers);
 
@@ -171,17 +170,18 @@ public class MovieListFragment extends Fragment implements RecyclerClickListener
                     e.printStackTrace();
                 }
 
-                List<ReviewResult> reviewResults=new ArrayList<>();
+                List<ReviewResult> reviewResults = new ArrayList<>();
+
                 try {
-                    JSONObject jsonObj=new JSONObject(reviews);
-                    JSONArray jsonAry=jsonObj.has("results")?jsonObj.getJSONArray("results"):null;
-                    if(jsonAry!=null){
-                        for (int i = 0; i < jsonAry.length(); i++) {
-                            JSONObject jsonObject = jsonAry.getJSONObject(i);
-                            ReviewResult review=new ReviewResult();
+                    JSONObject jsonObj = new JSONObject(reviews);
+                    JSONArray jsonArray = jsonObj.has("results") ? jsonObj.getJSONArray("results") : null;
+                    if (jsonArray != null) {
+                        for (int i = 0; i < jsonArray.length(); i++) {
+                            JSONObject jsonObject = jsonArray.getJSONObject(i);
+                            ReviewResult review = new ReviewResult();
 
                             review.id = jsonObject.has("id") ? jsonObject.getString("id") : "";
-                            review.author=(jsonObject.has("author") ? jsonObject.getString("author") : "");
+                            review.author = (jsonObject.has("author") ? jsonObject.getString("author") : "");
                             review.content = jsonObject.has("content") ? jsonObject.getString("content") : "";
                             review.url = jsonObject.has("url") ? jsonObject.getString("url") : "";
 
@@ -193,8 +193,8 @@ public class MovieListFragment extends Fragment implements RecyclerClickListener
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
-
                 movies.add(m);
+
             } while (cursor.moveToNext());
             cursor.close();
             mMovieArray = movies;
@@ -206,26 +206,24 @@ public class MovieListFragment extends Fragment implements RecyclerClickListener
                 mListener.openDetailFragment(mMovieArray.get(0));
             }
 
-        }else{
-            mMovieArray=null;
+        } else {
+            mMovieArray = null;
             mGridViewAdapter.setList(null);
-            Toast.makeText(getActivity(),R.string.no_movies_favorited,Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), R.string.no_movies_favorited, Toast.LENGTH_SHORT).show();
         }
     }
 
     @Override
     public void onPause() {
         super.onPause();
-//        Log.e(TAG, "Paused");
-        Bundle bun=new Bundle();
-        bun.putParcelableArrayList("movies", mMovieArray);
-        onSaveInstanceState(bun);
+        Bundle bundle = new Bundle();
+        bundle.putParcelableArrayList("movies", mMovieArray);
+        onSaveInstanceState(bundle);
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         outState.putParcelableArrayList("movies", mMovieArray);
-//        Log.e(TAG, "savedInstanceState method called");
         super.onSaveInstanceState(outState);
     }
 
@@ -252,6 +250,7 @@ public class MovieListFragment extends Fragment implements RecyclerClickListener
             HttpURLConnection urlConnection = null;
             BufferedReader reader = null;
             String jsonString = null;
+
             try {
                 Uri builtUri = Uri.parse(Constants.BASE_URL).buildUpon()
                     .appendPath(params[0])
@@ -259,7 +258,6 @@ public class MovieListFragment extends Fragment implements RecyclerClickListener
                     .build();
 
                 URL url = new URL(builtUri.toString());
-//                Log.e("URL", "Movies URL JSON Object: " + url);
 
                 urlConnection = (HttpURLConnection) url.openConnection();
                 urlConnection.setRequestMethod("GET");
@@ -281,6 +279,7 @@ public class MovieListFragment extends Fragment implements RecyclerClickListener
                     return null;
                 }
                 jsonString = buffer.toString();
+
             } catch (IOException e) {
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
@@ -288,20 +287,16 @@ public class MovieListFragment extends Fragment implements RecyclerClickListener
                         Toast.makeText(getActivity(), R.string.dead_network, Toast.LENGTH_LONG).show();
                     }
                 });
-
-                Log.e(TAG, "Error ", e);
                 return null;
+
             } finally {
                 if (urlConnection != null) {
-                    Log.e(TAG,"urlConnection!=null: "+urlConnection.getURL());
                     urlConnection.disconnect();
                 }
-                Log.e(TAG,"urlConnection==null: "+urlConnection.getURL());
                 if (reader != null) {
                     try {
                         reader.close();
                     } catch (final IOException e) {
-                        Log.e(TAG, "Error closing stream", e);
                     }
                 }
             }
@@ -330,10 +325,7 @@ public class MovieListFragment extends Fragment implements RecyclerClickListener
         }
 
         private ArrayList<Movie> parseJson(String JsonStr) throws JSONException {
-//            logMore("Json string before parsing: ",JsonStr);
-
             mMovieArray = new ArrayList<Movie>();
-
             JSONObject MoviesJson = new JSONObject(JsonStr);
             JSONArray moviesArray = MoviesJson.has("results") ? MoviesJson.getJSONArray("results") : null;
             if (moviesArray != null) {
@@ -348,9 +340,7 @@ public class MovieListFragment extends Fragment implements RecyclerClickListener
                     movie.mBackDropUrl = movieObj.has(Constants.BACKDROP_PATH) ? movieObj.getString(Constants.BACKDROP_PATH) : "";
                     movie.mDate = movieObj.has(Constants.DATE) ? movieObj.getString(Constants.DATE) : "";
                     movie.mVoteAverage = movieObj.has(Constants.RATING) ? movieObj.getDouble(Constants.RATING) : null;
-                    movie.mId=movieObj.has(Constants.ID)?movieObj.getInt(Constants.ID):null;
-
-                    Log.e(TAG, "posterUrl from JSON parsing: "+movie.getMovieTitle()+", "+movie.getPosterUrl());
+                    movie.mId = movieObj.has(Constants.ID) ? movieObj.getInt(Constants.ID):null;
 
                     mMovieArray.add(movie);
                 }
@@ -370,33 +360,26 @@ public class MovieListFragment extends Fragment implements RecyclerClickListener
             }
         }
     }
-//    public void onEvent(RefreshGridView event){
-//        getFavorites();
-//    }
-//    @Override
-//    public void onStart() {
-//        super.onStart();
-//        EventBus.getDefault().registerSticky(this);
-//    }
-//
-//    @Override
-//    public void onStop() {
-//        EventBus.getDefault().unregister(this);
-//        super.onStop();
-//    }
 
     /**
      * For attaching to the activity so this class can use the implemented MovieInterface on the MainActivity
-     * @param activity provided by Android
+     * @param context provided by Android
      */
+
     @Override
-    public void onAttach(Activity activity) {
-        super.onAttach(activity);
-        try {
-            mListener = (MainInterface.MovieInterface) activity;
-        } catch (ClassCastException e) {
-            throw new ClassCastException(activity.toString()
-                    + " must implement NoticeDialogListener");
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof MainInterface.MovieInterface) {
+            mListener = (MainInterface.MovieInterface) context;
+        } else {
+            throw new RuntimeException(context.toString()
+                    + " must implement MainInterface.MovieInterface");
         }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
     }
 }

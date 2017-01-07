@@ -21,4 +21,5 @@
     <string name="movie_trailer_name">Movie Trailer:</string>
     <string name="youtube_base_url">http://www.youtube.com/watch?v=</string>
     <string name="movie_review_from">"Movie Review from "</string>
+    <string name="get_stored_movies">/get_stored_movies</string>
 </resources>
